@@ -26,7 +26,14 @@ const Timer = ({ duration, onTimeUp }) => {
   return <div className="text-center text-xl">{timeLeft} seconds left</div>;
 };
 
-const PhoneAFriend = ({ gameData, questionNumber }) => {
+const PhoneAFriend = ({
+  gameData,
+  questionNumber,
+  playSound,
+  stopSound,
+  disabled,
+  disableLifeline,
+}) => {
   const [open, setOpen] = useState(false);
   const [stage, setStage] = useState("selectFriend");
   const [response, setResponse] = useState("");
@@ -53,12 +60,19 @@ const PhoneAFriend = ({ gameData, questionNumber }) => {
   ];
 
   const handleOpen = () => {
-    setOpen(!open);
+    playSound();
+    setOpen(true);
     setStage("selectFriend");
     setResponse("");
     setSelectedFriend(null);
     setConversation([]);
     setTimer(30);
+  };
+
+  const handleClose = () => {
+    stopSound();
+    setOpen(false);
+    disableLifeline("phoneAFriend");
   };
 
   const selectFriendHandler = (friend) => {
@@ -111,12 +125,22 @@ const PhoneAFriend = ({ gameData, questionNumber }) => {
 
   return (
     <>
-      <button className="lifeline" onClick={handleOpen}>
-        Phone a Friend
+      <button
+        className={`lifeline ${disabled ? "disabled" : ""}`}
+        onClick={handleOpen}
+        disabled={disabled}
+      >
+        {disabled && (
+          <span className="cross-icon">
+            <span className="line1"></span>
+            <span className="line2"></span>
+          </span>
+        )}
+        Phone A Friend
       </button>
       <Dialog
         open={open}
-        onClose={handleOpen}
+        onClose={handleClose}
         size="md"
         className="bg-gray-900 text-white"
       >
@@ -165,7 +189,7 @@ const PhoneAFriend = ({ gameData, questionNumber }) => {
           {stage === "response" && <p className="text-lg">{response}</p>}
         </DialogBody>
         <DialogFooter>
-          <Button onClick={handleOpen} className="bg-red-500 text-white">
+          <Button onClick={handleClose} className="bg-red-500 text-white">
             Close
           </Button>
         </DialogFooter>

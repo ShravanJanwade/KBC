@@ -6,7 +6,12 @@ import {
   DialogBody,
   DialogFooter,
 } from "@material-tailwind/react";
-const ExpertAdvice = ({ gameData, questionNumber }) => {
+const ExpertAdvice = ({
+  gameData,
+  questionNumber,
+  disabled,
+  disableLifeline,
+}) => {
   // const ExpertAdviceHandler = () => {
   //   console.log("Using Expert Advice lifeline");
   //   alert("Expert Advice lifeline activated.");
@@ -18,16 +23,33 @@ const ExpertAdvice = ({ gameData, questionNumber }) => {
   // };
   const [open, setOpen] = useState(false);
 
-  const handleOpen = () => setOpen(!open);
-
+  const handleOpen = () => {
+    setOpen(true);
+    console.log("Hello World");
+  };
+  const handleClose = () => {
+    setOpen(false);
+    console.log("Hello");
+    disableLifeline("expertAdvice");
+  };
   return (
     <>
-      <button className="lifeline" onClick={handleOpen}>
+      <button
+        className={`lifeline ${disabled ? "disabled" : ""}`}
+        onClick={handleOpen}
+        disabled={disabled}
+      >
+        {disabled && (
+          <span className="cross-icon">
+            <span className="line1"></span>
+            <span className="line2"></span>
+          </span>
+        )}
         Expert Advice
       </button>
       <Dialog
         open={open}
-        onClose={handleOpen}
+        onClose={handleClose}
         size="md"
         className="bg-gray-900 text-white"
       >
@@ -36,7 +58,7 @@ const ExpertAdvice = ({ gameData, questionNumber }) => {
         </DialogHeader>
         <DialogBody>{gameData[questionNumber].question}</DialogBody>
         <DialogFooter>
-          <Button onClick={handleOpen} className="bg-red-500 text-white">
+          <Button onClick={handleClose} className="bg-red-500 text-white">
             Close
           </Button>
         </DialogFooter>

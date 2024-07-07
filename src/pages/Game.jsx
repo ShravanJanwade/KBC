@@ -15,9 +15,12 @@ import selectSound from "../assets/LetPlay.mp3";
 import correctSound from "../assets/correctAnswer.mp3";
 import wrongSound from "../assets/wrong answer.mp3";
 import winSound from "../assets/winner.mp3";
+import timerSound from "../assets/Time's Up.mp3"; // Import the timer sound
+import { Modal, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const Game = () => {
-  const [questionNumber, setQuestionNumber] = useState(0);
+  const [questionNumber, setQuestionNumber] = useState(11);
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [optionColors, setOptionColors] = useState({
     A: "",
@@ -27,6 +30,8 @@ const Game = () => {
   });
   const [resetTimer, setResetTimer] = useState(0);
   const [initialTime, setInitialTime] = useState(30); // Initial timer set to 30 seconds
+  const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const [prizeMoney, setPrizeMoney] = useState(0);
 
   const [playIntro, { stop: stopIntro }] = useSound(introSound);
   const [playQuestion1to10, { stop: stopQuestion1to10 }] =
@@ -39,11 +44,34 @@ const Game = () => {
   const [playCorrect, { stop: stopCorrect }] = useSound(correctSound);
   const [playWrong, { stop: stopWrong }] = useSound(wrongSound);
   const [playWin, { stop: stopWin }] = useSound(winSound);
+  const [playTimerSound, { stop: stopTimerSound }] = useSound(timerSound); // Setup the timer sound
+  const navigate = useNavigate();
+
+  const onReturnToMenu = () => {
+    navigate("/Menu");
+  };
+
+  const stopAllSounds = () => {
+    stopIntro();
+    stopQuestion1to10();
+    stopQuestion10to15();
+    stopFinalQuestions();
+    stopSelect();
+    stopCorrect();
+    stopWrong();
+    stopWin();
+    stopTimerSound(); // Stop the timer sound as well
+  };
+
+  const playSound = (sound) => {
+    stopAllSounds();
+    sound();
+  };
 
   useEffect(() => {
-    playIntro();
-    return () => stopIntro();
-  }, [playIntro, stopIntro]);
+    playSound(playIntro);
+    return () => stopAllSounds();
+  }, []);
 
   useEffect(() => {
     if (questionNumber < 5) {
@@ -57,59 +85,47 @@ const Game = () => {
   }, [questionNumber]);
 
   useEffect(() => {
-    stopIntro();
-    stopQuestion1to10();
-    stopQuestion10to15();
-    stopFinalQuestions();
-
     if (questionNumber < 10) {
-      playQuestion1to10();
+      playSound(playQuestion1to10);
     } else if (questionNumber >= 10 && questionNumber < 14) {
-      playQuestion10to15();
+      playSound(playQuestion10to15);
     } else if (questionNumber >= 14) {
-      playFinalQuestions();
+      playSound(playFinalQuestions);
     }
-  }, [
-    questionNumber,
-    playQuestion1to10,
-    playQuestion10to15,
-    playFinalQuestions,
-    stopIntro,
-    stopQuestion1to10,
-    stopQuestion10to15,
-    stopFinalQuestions,
-  ]);
+  }, [questionNumber]);
 
   const handleTimeUp = () => {
-    alert("Time's up! Moving to the next question.");
-    setQuestionNumber((prev) => prev + 1);
-    setSelectedAnswer("");
-    setOptionColors({
-      A: "",
-      B: "",
-      C: "",
-      D: "",
-    });
+    playSound(playTimerSound);
+    setTimeout(() => {
+      handleGameOver();
+    }, 2000); // Give some time for the timer sound to play before showing the modal
+  };
+
+  const calculatePrizeMoney = () => {
+    if (questionNumber >= 10) return 32000;
+    if (questionNumber >= 5) return 1000;
+    return 0;
+  };
+
+  const handleGameOver = () => {
+    setPrizeMoney(calculatePrizeMoney());
+    setShowGameOverModal(true);
   };
 
   const checkAnswer = (selectedOption) => {
     const correctAnswer = gameData[questionNumber].answer;
     const updatedColors = { ...optionColors, [selectedOption]: "orange" };
     setOptionColors(updatedColors);
-    stopSelect();
-    playSelect();
+    playSound(playSelect);
     setResetTimer((prev) => prev + 1); // Stop the timer
 
     setTimeout(() => {
-      stopSelect();
       if (selectedOption === correctAnswer) {
-        console.log("Correct Answer");
         setOptionColors({ ...optionColors, [selectedOption]: "green" });
-        playCorrect();
+        playSound(playCorrect);
         setTimeout(() => {
-          stopCorrect();
           if (questionNumber === gameData.length - 1) {
-            playWin();
+            playSound(playWin);
             alert("You Won");
           } else {
             setQuestionNumber(questionNumber + 1);
@@ -124,19 +140,10 @@ const Game = () => {
           }
         }, 2000);
       } else {
-        console.log("Wrong Answer");
         setOptionColors({ ...optionColors, [selectedOption]: "red" });
-        playWrong();
+        playSound(playWrong);
         setTimeout(() => {
-          stopWrong();
-          setOptionColors({
-            A: "",
-            B: "",
-            C: "",
-            D: "",
-          });
-          setQuestionNumber(questionNumber + 1);
-          setResetTimer((prev) => prev + 1); // Restart the timer
+          handleGameOver();
         }, 2000);
       }
     }, 2000);
@@ -156,7 +163,6 @@ const Game = () => {
         alignItems: "center",
         justifyContent: "center",
         padding: "20px",
-        // marginLeft: "-200px",
       }}
     >
       <Lifelines
@@ -181,6 +187,30 @@ const Game = () => {
         />
         <MoneySection questionNumber={questionNumber + 1} />
       </div>
+
+      <Modal
+        show={showGameOverModal}
+        onHide={() => setShowGameOverModal(false)}
+        dialogClassName="tailwind-modal"
+        backdropClassName="tailwind-backdrop"
+      >
+        <div className="bg-gradient-to-r from-purple-800 to-indigo-800 p-8 rounded-lg shadow-lg text-white">
+          <Modal.Header closeButton className="border-b-0">
+            <Modal.Title className="text-3xl font-bold">Game Over</Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="py-4">
+            <p className="text-xl">You won: ${prizeMoney}</p>
+          </Modal.Body>
+          <Modal.Footer className="border-t-0 justify-center">
+            <button
+              className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+              onClick={onReturnToMenu}
+            >
+              OK
+            </button>
+          </Modal.Footer>
+        </div>
+      </Modal>
     </div>
   );
 };

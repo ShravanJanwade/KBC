@@ -55,3 +55,43 @@
 .lifeline:hover::after {
   border-color: transparent transparent transparent #29293d;
 }
+
+
+.lifeline.disabled {
+  background-color: #f44336; /* Red */
+  cursor: not-allowed;
+}
+
+.cross-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cross-icon .line1,
+.cross-icon .line2 {
+  position: absolute;
+  background-color: white;
+}
+
+.cross-icon .line1 {
+  width: 2px;
+  height: 100%;
+  transform: rotate(45deg);
+}
+
+.cross-icon .line2 {
+  width: 2px;
+  height: 100%;
+  transform: rotate(-45deg);
+}
+
+.lifeline.disabled .cross-icon .line1,
+.lifeline.disabled .cross-icon .line2 {
+  background-color: white;
+}

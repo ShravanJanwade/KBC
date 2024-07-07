@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -8,15 +8,36 @@ import {
 } from "@material-tailwind/react";
 import { VictoryBar, VictoryChart, VictoryAxis, VictoryTooltip } from "victory";
 
-const AudiencePoll = ({ question }) => {
+const AudiencePoll = ({
+  question,
+  playSound,
+  stopSound,
+  disabled,
+  disableLifeline,
+}) => {
   const [open, setOpen] = useState(false);
 
-  const handleOpen = () => setOpen(!open);
+  const handleOpen = () => {
+    playSound();
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    stopSound();
+    setOpen(false);
+    disableLifeline("audiencePoll");
+  };
+
+  useEffect(() => {
+    return () => {
+      stopSound();
+    };
+  }, [stopSound]);
 
   const options = Object.keys(question.options);
 
   const generatePollData = () => {
-    const correctAnswer = question.answer;
+    // const correctAnswer = question.answer;
     const correctHighest = Math.random() < 0.99;
 
     let percentages = [];
@@ -80,12 +101,22 @@ const AudiencePoll = ({ question }) => {
 
   return (
     <>
-      <button className="lifeline" onClick={handleOpen}>
-        Audience Poll
+      <button
+        className={`lifeline ${disabled ? "disabled" : ""}`}
+        onClick={handleOpen}
+        disabled={disabled}
+      >
+        {disabled && (
+          <span className="cross-icon">
+            <span className="line1"></span>
+            <span className="line2"></span>
+          </span>
+        )}
+        AudiencePoll
       </button>
       <Dialog
         open={open}
-        onClose={handleOpen}
+        onClose={handleClose}
         size="md"
         className="bg-gray-900 text-white"
       >
@@ -126,7 +157,7 @@ const AudiencePoll = ({ question }) => {
           </VictoryChart>
         </DialogBody>
         <DialogFooter>
-          <Button onClick={handleOpen} className="bg-red-500 text-white">
+          <Button onClick={handleClose} className="bg-red-500 text-white">
             Close
           </Button>
         </DialogFooter>
