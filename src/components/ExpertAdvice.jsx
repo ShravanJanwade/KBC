@@ -6,6 +6,7 @@ import {
   DialogBody,
   DialogFooter,
 } from "@material-tailwind/react";
+import logo from "../assets/expertAdvice.jpg";
 const ExpertAdvice = ({
   gameData,
   questionNumber,
@@ -45,7 +46,7 @@ const ExpertAdvice = ({
             <span className="line2"></span>
           </span>
         )}
-        Expert Advice
+        <img style={{ height: "50px", opacity: "0.7" }} src={logo} />
       </button>
       <Dialog
         open={open}

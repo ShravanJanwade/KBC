@@ -7,7 +7,7 @@ import {
   DialogFooter,
 } from "@material-tailwind/react";
 import { VictoryBar, VictoryChart, VictoryAxis, VictoryTooltip } from "victory";
-
+import logo from "../assets/audiencePoll.webp";
 const AudiencePoll = ({
   question,
   playSound,
@@ -112,7 +112,7 @@ const AudiencePoll = ({
             <span className="line2"></span>
           </span>
         )}
-        AudiencePoll
+        <img style={{ height: "50px", opacity: "0.7" }} src={logo} />
       </button>
       <Dialog
         open={open}

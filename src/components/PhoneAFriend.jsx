@@ -6,7 +6,7 @@ import {
   DialogBody,
   DialogFooter,
 } from "@material-tailwind/react";
-
+import logo from "../assets/phoneAFriend.png";
 // Timer component
 const Timer = ({ duration, onTimeUp }) => {
   const [timeLeft, setTimeLeft] = useState(duration);
@@ -136,7 +136,7 @@ const PhoneAFriend = ({
             <span className="line2"></span>
           </span>
         )}
-        Phone A Friend
+        <img style={{ height: "50px", opacity: "0.7" }} src={logo} />
       </button>
       <Dialog
         open={open}

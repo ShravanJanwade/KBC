@@ -1,5 +1,5 @@
 import React from "react";
-
+import logo from "../assets/fiftyfifty.jpg";
 const FiftyFifty = ({
   question,
   setOptionColors,
@@ -43,7 +43,7 @@ const FiftyFifty = ({
           <span className="line2"></span>
         </span>
       )}
-      50-50
+      <img style={{ height: "50px", opacity: "0.7" }} src={logo} />
     </button>
   );
 };
