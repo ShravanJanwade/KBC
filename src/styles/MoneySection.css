@@ -1,0 +1,85 @@
+.money-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 300px;
+  padding: 10px;
+  color: white;
+  font-family: Arial, sans-serif;
+  border: 2px solid #6b6b83;
+  border-radius: 20px;
+  background-color: #1e1e2f;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  margin-top: -7%;
+  /* margin-bottom: 20px; */
+}
+
+.money-level {
+  width: 100%;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1e1e2f;
+  border: 2px solid #6b6b83;
+  border-radius: 20px;
+  margin: 5px 0;
+  text-align: center;
+  font-size: 1em;
+  position: relative;
+  padding: 5px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.money-level::before, .money-level::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.money-level::before {
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 20px 15px 20px 0;
+  border-color: transparent #1e1e2f transparent transparent;
+}
+
+.money-level::after {
+  right: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 20px 0 20px 15px;
+  border-color: transparent transparent transparent #1e1e2f;
+}
+
+.money-level:hover {
+  transform: scale(1.05);
+  background-color: #29293d;
+}
+
+.money-level:hover::before {
+  border-color: transparent #29293d transparent transparent;
+}
+
+.money-level:hover::after {
+  border-color: transparent transparent transparent #29293d;
+}
+
+.money-level.active {
+  background-color: #FFD700;
+  color: black;
+}
+
+.money-level.active::before {
+  border-color: transparent #FFD700 transparent transparent;
+}
+
+.money-level.active::after {
+  border-color: transparent transparent transparent #FFD700;
+}

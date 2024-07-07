@@ -1,0 +1,42 @@
+.menu-container {
+  display: flex;
+  height: 100vh; /* Full viewport height */
+  background-color: #1a1a1a; /* Dark background color */
+}
+
+.logo-section {
+  flex: 1; /* Takes up left half */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-image {
+  max-width: 80%; /* Adjust the size as needed */
+  height: auto;
+}
+
+.options-section {
+  flex: 1; /* Takes up right half */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.options-list {
+  list-style-type: none;
+  padding: 0;
+  text-align: center;
+}
+
+.option-item {
+  font-size: 24px; /* Adjust font size */
+  padding: 10px 20px;
+  margin: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.option-item:hover {
+  background-color: #4caf50; /* Green color on hover */
+}

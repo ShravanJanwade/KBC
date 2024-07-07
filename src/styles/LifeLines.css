@@ -1,0 +1,57 @@
+.lifelines {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  margin-left: -15%;
+}
+
+.lifeline {
+  background-color: #1e1e2f;
+  border: 2px solid #6b6b83;
+  border-radius: 20px;
+  color: white;
+  font-size: 1em;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.lifeline::before, .lifeline::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.lifeline::before {
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 20px 15px 20px 0;
+  border-color: transparent #1e1e2f transparent transparent;
+}
+
+.lifeline::after {
+  right: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 20px 0 20px 15px;
+  border-color: transparent transparent transparent #1e1e2f;
+}
+
+.lifeline:hover {
+  transform: scale(1.05);
+  background-color: #40408e;
+}
+
+.lifeline:hover::before {
+  border-color: transparent #29293d transparent transparent;
+}
+
+.lifeline:hover::after {
+  border-color: transparent transparent transparent #29293d;
+}
