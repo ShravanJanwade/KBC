@@ -1,0 +1,62 @@
+:root {
+  /* Stage */
+  --bg-0: #03021a;
+  --bg-1: #08062e;
+  --bg-2: #130d4d;
+  --bg-3: #1d1470;
+  --violet: #6d3df5;
+  --violet-2: #9b6bff;
+  --blue: #2f6bff;
+  --cyan: #45d4ff;
+
+  /* Metals */
+  --gold-0: #fffbe6;
+  --gold-1: #fff0b8;
+  --gold-2: #f6d27a;
+  --gold-3: #d9a441;
+  --gold-4: #a36f17;
+  --gold-5: #6b4508;
+  --silver-1: #f3f6ff;
+  --silver-2: #c3cdf0;
+  --silver-3: #7d8bbb;
+  --silver-4: #3f4a7a;
+
+  /* States */
+  --amber: #ffb020;
+  --orange: #ff8a00;
+  --orange-deep: #c55a00;
+  --green: #2fdc72;
+  --green-deep: #0f8a3c;
+  --red: #ff4d5e;
+  --red-deep: #a3132a;
+
+  /* Text */
+  --text: #f4f6ff;
+  --text-dim: #b4bce2;
+  --text-faint: #7480b5;
+
+  /* Surfaces */
+  --glass: rgba(18, 14, 70, 0.58);
+  --glass-strong: rgba(12, 9, 52, 0.82);
+  --glass-border: rgba(170, 180, 255, 0.16);
+  --glass-border-strong: rgba(200, 210, 255, 0.28);
+  --hairline: rgba(255, 255, 255, 0.08);
+
+  /* Type */
+  --font-ui: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: "Cinzel", "Trajan Pro", "Times New Roman", serif;
+  --font-num: "Rajdhani", "Poppins", "Segoe UI", sans-serif;
+  --font-hi: "Hind", "Nirmala UI", "Mangal", "Poppins", sans-serif;
+
+  /* Shape & motion */
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --shadow-lg: 0 30px 80px -20px rgba(0, 0, 0, 0.75), 0 0 0 1px var(--glass-border);
+  --gold-text: linear-gradient(180deg, var(--gold-0) 0%, var(--gold-2) 45%, var(--gold-3) 60%, var(--gold-1) 100%);
+  --silver-text: linear-gradient(180deg, #ffffff 0%, var(--silver-1) 40%, var(--silver-2) 62%, #ffffff 100%);
+}

@@ -1,0 +1,255 @@
+.lz {
+  --tip: 26px;
+  --bw: 2px;
+  --rim: linear-gradient(180deg, #f2f5ff 0%, #a7b3e4 30%, #4c5893 52%, #8e9bd2 72%, #e9eeff 100%);
+  --fill: linear-gradient(180deg, #1b2c8f 0%, #0d1862 46%, #070d40 54%, #102072 100%);
+  --ink: var(--text);
+  --label: var(--amber);
+  --glow: rgba(80, 120, 255, 0);
+  --poly: polygon(var(--tip) 0, calc(100% - var(--tip)) 0, 100% 50%, calc(100% - var(--tip)) 100%, var(--tip) 100%, 0 50%);
+  --poly-in: polygon(calc(var(--tip) - var(--bw)) 0, calc(100% - var(--tip) + var(--bw)) 0, 100% 50%, calc(100% - var(--tip) + var(--bw)) 100%, calc(var(--tip) - var(--bw)) 100%, 0 50%);
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  color: var(--ink);
+  isolation: isolate;
+  filter: drop-shadow(0 0 12px var(--glow));
+  transition: filter 0.35s ease, transform 0.25s var(--ease-out), opacity 0.4s ease;
+  text-align: left;
+}
+
+.lz__shape,
+.lz__fill {
+  position: absolute;
+  pointer-events: none;
+}
+.lz__shape {
+  inset: 0;
+  clip-path: var(--poly);
+  background: var(--rim);
+  z-index: -2;
+}
+.lz__fill {
+  inset: var(--bw);
+  clip-path: var(--poly-in);
+  background: var(--fill);
+  z-index: -1;
+  overflow: hidden;
+  transition: filter 0.3s ease;
+}
+/* glossy upper half */
+.lz__fill::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 50% 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.02));
+}
+/* travelling shine */
+.lz__fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -40%;
+  width: 30%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  transform: translateX(-120%) skewX(-18deg);
+  opacity: 0;
+}
+
+.lz__content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  width: 100%;
+  padding: 0.55em calc(var(--tip) + 0.7em);
+  line-height: 1.3;
+}
+
+.lz__label {
+  font-family: var(--font-num);
+  font-weight: 700;
+  font-size: 1.12em;
+  color: var(--label);
+  min-width: 1.3em;
+  transition: color 0.3s;
+}
+
+/* Sizes */
+.lz--q {
+  --tip: clamp(26px, 3vw, 46px);
+  --bw: 2.5px;
+  min-height: clamp(86px, 13vh, 128px);
+  font-size: clamp(1.02rem, 1.55vw, 1.5rem);
+  font-weight: 600;
+}
+.lz--q .lz__content {
+  justify-content: center;
+  text-align: center;
+  padding: 0.8em calc(var(--tip) + 1em);
+  text-wrap: balance;
+}
+.lz--opt {
+  min-height: clamp(50px, 7.2vh, 66px);
+  font-size: clamp(0.92rem, 1.15vw, 1.14rem);
+  font-weight: 500;
+}
+.lz--menu {
+  --tip: 22px;
+  min-height: 58px;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.lz--sm {
+  --tip: 16px;
+  min-height: 42px;
+  font-size: 0.95rem;
+}
+
+/* Interactive hover */
+.lz--interactive {
+  cursor: pointer;
+}
+.lz--interactive[data-state="idle"]:hover,
+.lz--interactive[data-state="idle"]:focus-visible {
+  --rim: linear-gradient(180deg, #fff7d6 0%, #f6d27a 30%, #a8741a 52%, #f2c14e 72%, #fff3c4 100%);
+  --glow: rgba(120, 160, 255, 0.55);
+  outline: none;
+}
+.lz--interactive[data-state="idle"]:hover .lz__fill,
+.lz--interactive[data-state="idle"]:focus-visible .lz__fill {
+  filter: brightness(1.35) saturate(1.1);
+}
+.lz--interactive[data-state="idle"]:hover .lz__fill::after,
+.lz--interactive[data-state="idle"]:focus-visible .lz__fill::after {
+  animation: lz-shine 0.9s var(--ease-out);
+}
+.lz--interactive:active {
+  transform: scale(0.985);
+}
+
+@keyframes lz-shine {
+  0% {
+    opacity: 1;
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(560%) skewX(-18deg);
+  }
+}
+
+/* States */
+.lz[data-state="gold"] {
+  --rim: linear-gradient(180deg, #fffbe6 0%, #f6d27a 30%, #a8741a 52%, #f2c14e 72%, #fff3c4 100%);
+  --glow: rgba(246, 210, 122, 0.35);
+}
+
+.lz[data-state="selected"] {
+  --rim: linear-gradient(180deg, #fffbe6 0%, #ffd56b 35%, #c27a07 55%, #ffc94a 100%);
+  --fill: linear-gradient(180deg, #4a2d9a 0%, #2e1b78 46%, #1f1260 54%, #3a2390 100%);
+  --glow: rgba(255, 200, 80, 0.7);
+  animation: lz-pulse 1s ease-in-out infinite;
+}
+@keyframes lz-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(255, 190, 70, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(255, 190, 70, 0.95));
+  }
+}
+
+.lz[data-state="locked"] {
+  --rim: linear-gradient(180deg, #fffbe6 0%, #ffe3a3 40%, #b86b00 55%, #ffd27a 100%);
+  --fill: linear-gradient(180deg, #ffd27a 0%, #ffa21f 44%, #e57600 56%, #ffb347 100%);
+  --ink: #1d0e00;
+  --label: #3b1d00;
+  --glow: rgba(255, 150, 20, 0.85);
+}
+
+.lz[data-state="correct"] {
+  --rim: linear-gradient(180deg, #f2fff6 0%, #b6f5cc 40%, #0f8a3c 55%, #9fefbe 100%);
+  --fill: linear-gradient(180deg, #8ff0b2 0%, #2fdc72 44%, #13a64d 56%, #4be38a 100%);
+  --ink: #02200c;
+  --label: #033d17;
+  --glow: rgba(47, 220, 114, 0.95);
+}
+.lz[data-state="correct"].lz--flash {
+  animation: lz-flash 0.34s steps(1) 0s 6;
+}
+@keyframes lz-flash {
+  0% {
+    filter: drop-shadow(0 0 26px rgba(47, 220, 114, 1)) brightness(1.15);
+  }
+  50% {
+    filter: drop-shadow(0 0 4px rgba(47, 220, 114, 0.3)) brightness(0.72);
+  }
+}
+
+.lz[data-state="wrong"] {
+  --rim: linear-gradient(180deg, #fff1f2 0%, #ffb3bb 40%, #9b1023 55%, #ff8f9b 100%);
+  --fill: linear-gradient(180deg, #ff9aa5 0%, #ff4d5e 44%, #c81e33 56%, #ff6b79 100%);
+  --ink: #2a0007;
+  --label: #4a000c;
+  --glow: rgba(255, 77, 94, 0.9);
+  animation: lz-shake 0.5s var(--ease-out);
+}
+@keyframes lz-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(7px);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+.lz[data-state="dim"] {
+  opacity: 0.42;
+}
+
+.lz[data-state="removed"] {
+  --fill: linear-gradient(180deg, #0c1240 0%, #070a2c 100%);
+  --rim: linear-gradient(180deg, #3b4372, #20274f);
+  cursor: default;
+  pointer-events: none;
+}
+.lz[data-state="removed"] .lz__content {
+  opacity: 0;
+  transition: opacity 0.5s ease 0.2s;
+}
+
+/* Rails: the thin line that runs through every row of lozenges, edge to edge */
+.rail {
+  position: relative;
+}
+.rail::before {
+  content: "";
+  position: absolute;
+  left: -100vw;
+  right: -100vw;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, transparent 0%, rgba(180, 195, 255, 0.5) 30%, rgba(220, 228, 255, 0.75) 50%, rgba(180, 195, 255, 0.5) 70%, transparent 100%);
+  box-shadow: 0 0 10px rgba(120, 160, 255, 0.5);
+  z-index: 0;
+  pointer-events: none;
+}
+.rail > * {
+  position: relative;
+  z-index: 1;
+}

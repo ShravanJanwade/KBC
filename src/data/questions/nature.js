@@ -1,0 +1,72 @@
+// Nature & Wildlife — 50 questions. o[0] is always the correct answer; options are shuffled at runtime.
+export default [
+  // ── d1 ──
+  { id: "nat-001", d: 1, q: "Which animal is the national animal of India?", o: ["Tiger", "Lion", "Elephant", "Leopard"], f: "The tiger is India's national animal, and India is home to about three-quarters of the world's wild tigers." },
+  { id: "nat-002", d: 1, q: "Which bird is the national bird of India?", o: ["Peacock", "Parrot", "Pigeon", "Eagle"], f: "The Indian peafowl, or peacock, was declared India's national bird in 1963 and is fully protected by law." },
+  { id: "nat-003", d: 1, q: "Which animal is called the 'Ship of the Desert'?", o: ["Camel", "Horse", "Donkey", "Yak"], f: "The camel is the 'Ship of the Desert'; its hump stores fat, not water, and it can go days without drinking." },
+  { id: "nat-004", d: 1, q: "Which animal is popularly called the 'King of the Jungle'?", o: ["Lion", "Tiger", "Elephant", "Gorilla"], f: "The lion is hailed as the King of the Jungle, though it actually lives in grasslands and open savannas, not jungles." },
+
+  // ── d2 ──
+  { id: "nat-005", d: 2, q: "Which is the largest animal living on Earth today?", o: ["Blue whale", "Whale shark", "Sperm whale", "Giant squid"], f: "The blue whale, up to about 30 m long and well over 100 tonnes, is the largest animal alive today." },
+  { id: "nat-006", d: 2, q: "Which is the fastest land animal?", o: ["Cheetah", "Leopard", "Lion", "Horse"], f: "The cheetah can sprint at about 100 km/h or more, though only in short bursts of a few hundred metres." },
+  { id: "nat-007", d: 2, q: "Which is the largest living bird in the world?", o: ["Ostrich", "Emu", "Albatross", "Condor"], f: "The flightless ostrich is the largest living bird; it can run at about 70 km/h and lays the biggest eggs of any bird." },
+  { id: "nat-008", d: 2, q: "How many legs does an insect have?", o: ["Six", "Eight", "Four", "Ten"], f: "All adult insects have six legs and three body parts; spiders, with eight legs, are arachnids, not insects." },
+  { id: "nat-009", d: 2, q: "Which reptile is famous for changing the colour of its skin?", o: ["Chameleon", "Crocodile", "Tortoise", "Python"], f: "Chameleons change colour by adjusting tiny crystals in their skin cells, mostly to signal mood and control body heat." },
+
+  // ── d3 ──
+  { id: "nat-010", d: 3, q: "What is a baby kangaroo called?", o: ["Joey", "Cub", "Kid", "Calf"], f: "A newborn joey is only about the size of a jellybean and spends months growing inside its mother's pouch." },
+  { id: "nat-011", d: 3, q: "Which is the only mammal capable of true flight?", o: ["Bat", "Flying squirrel", "Flying lemur", "Sugar glider"], f: "Bats are the only mammals capable of true powered flight; 'flying' squirrels and sugar gliders merely glide." },
+  { id: "nat-012", d: 3, q: "Kaziranga National Park in Assam is world-famous for which animal?", o: ["One-horned rhinoceros", "Red panda", "Lion-tailed macaque", "Nilgiri tahr"], f: "Kaziranga, a UNESCO World Heritage Site, shelters about two-thirds of the world's greater one-horned rhinos." },
+  { id: "nat-013", d: 3, q: "Gir National Park in Gujarat is the last stronghold of which big cat?", o: ["Asiatic lion", "Bengal tiger", "Clouded leopard", "Jaguar"], f: "Gir in Gujarat is the last wild stronghold of the Asiatic lion, which now also roams the wider Saurashtra region." },
+  { id: "nat-014", d: 3, q: "Which is the largest land animal in the world?", o: ["African elephant", "Asian elephant", "Hippopotamus", "White rhinoceros"], f: "The African bush elephant is the largest land animal; big bulls can weigh 6 tonnes or more." },
+  { id: "nat-015", d: 3, q: "Which of these is a carnivorous plant that traps insects?", o: ["Venus flytrap", "Money plant", "Aloe vera", "Tulsi"], f: "The Venus flytrap snaps its leaves shut when an insect touches its trigger hairs twice, then slowly digests the prey." },
+
+  // ── d4 ──
+  { id: "nat-016", d: 4, q: "Which bird is known for laying its eggs in crows' nests?", o: ["Asian koel", "Common myna", "Red-vented bulbul", "House sparrow"], f: "The Asian koel is a brood parasite: it lays its eggs in crows' nests and lets the crows raise its chicks." },
+  { id: "nat-017", d: 4, q: "Which bird is famous for being able to hover and even fly backwards?", o: ["Hummingbird", "Sparrow", "Swallow", "Woodpecker"], f: "Hummingbirds can hover and even fly backwards, beating their wings up to about 80 times a second." },
+  { id: "nat-018", d: 4, q: "In which animal does the male, not the female, give birth to the young?", o: ["Seahorse", "Emperor penguin", "Clownfish", "Kangaroo"], f: "In seahorses, the female lays her eggs in the male's brood pouch, and he later gives birth to the fully formed babies." },
+  { id: "nat-019", d: 4, q: "Which of these mammals lays eggs?", o: ["Platypus", "Kangaroo", "Koala", "Wombat"], f: "The platypus is a monotreme, one of the few egg-laying mammals, along with the spiny echidnas." },
+  { id: "nat-020", d: 4, q: "Lemurs are native only to which island country?", o: ["Madagascar", "Sri Lanka", "Indonesia", "Philippines"], f: "Lemurs are native only to Madagascar, where over 100 kinds evolved in isolation from the rest of the world's primates." },
+  { id: "nat-021", d: 4, q: "By what name is the famous Bharatpur Bird Sanctuary in Rajasthan officially known?", o: ["Keoladeo National Park", "Ranthambore National Park", "Sariska Tiger Reserve", "Desert National Park"], f: "Keoladeo National Park at Bharatpur, a UNESCO World Heritage Site, once drew wintering Siberian cranes." },
+
+  // ── d5 ──
+  { id: "nat-022", d: 5, q: "India's first national park, set up in 1936 as Hailey National Park, is now known as?", o: ["Jim Corbett National Park", "Kanha National Park", "Bandipur National Park", "Ranthambore National Park"], f: "Jim Corbett National Park in Uttarakhand began in 1936 as Hailey National Park, and Project Tiger was launched there in 1973." },
+  { id: "nat-023", d: 5, q: "Which animal was declared India's National Aquatic Animal in 2009?", o: ["Ganges river dolphin", "Irrawaddy dolphin", "Golden mahseer", "Saltwater crocodile"], f: "The nearly blind Ganges river dolphin, which finds its way by echolocation, became India's National Aquatic Animal in 2009." },
+  { id: "nat-024", d: 5, q: "In 2022, cheetahs brought from Namibia were released into which Indian national park?", o: ["Kuno National Park", "Kanha National Park", "Bandhavgarh National Park", "Satpura National Park"], f: "Eight Namibian cheetahs entered Madhya Pradesh's Kuno National Park in September 2022, 70 years after the cheetah was declared extinct in India." },
+  { id: "nat-025", d: 5, q: "Which elusive Himalayan cat is called the 'ghost of the mountains'?", o: ["Snow leopard", "Clouded leopard", "Eurasian lynx", "Asian golden cat"], f: "The snow leopard is called the 'ghost of the mountains' for its smoky camouflaged coat and secretive life on high rocky slopes." },
+  { id: "nat-026", d: 5, q: "Which treeless biome has permanently frozen subsoil called permafrost?", o: ["Tundra", "Taiga", "Savanna", "Steppe"], f: "The tundra is treeless because permafrost and short summers block deep roots, so mosses, lichens and low shrubs dominate." },
+  { id: "nat-027", d: 5, q: "Which sea creature has three hearts and blue blood?", o: ["Octopus", "Starfish", "Jellyfish", "Sea urchin"], f: "An octopus has three hearts — two pump blood through the gills, one through the body — and copper-rich blue blood." },
+
+  // ── d6 ──
+  { id: "nat-028", d: 6, q: "Keibul Lamjao, the world's only floating national park, is in which state?", o: ["Manipur", "Assam", "Mizoram", "Kerala"], f: "Keibul Lamjao floats on 'phumdis' in Manipur's Loktak Lake and is the last natural home of the sangai, the dancing deer." },
+  { id: "nat-029", d: 6, q: "In which year did the Government of India launch Project Elephant?", o: ["1992", "1973", "1986", "2002"], f: "Project Elephant was launched in 1992 to protect elephants, their habitats and migration corridors, nearly two decades after Project Tiger." },
+  { id: "nat-030", d: 6, q: "Which plant produces the largest single flower in the world?", o: ["Rafflesia", "Lotus", "Sunflower", "Magnolia"], f: "Rafflesia arnoldii bears the largest single flower, up to about a metre wide, and it smells of rotting flesh to lure flies." },
+  { id: "nat-031", d: 6, q: "Which Indian tree is popularly called the 'Flame of the Forest'?", o: ["Palash", "Amaltas", "Neem", "Kadamb"], f: "Palash, the Flame of the Forest, bursts into fiery orange blooms in spring; its flowers were used to make Holi colours." },
+  { id: "nat-032", d: 6, q: "Gahirmatha in Odisha is famous for the mass nesting of which turtle?", o: ["Olive ridley", "Leatherback", "Hawksbill", "Green turtle"], f: "Gahirmatha is among the world's largest nesting sites of olive ridley turtles, which come ashore in huge 'arribadas'." },
+  { id: "nat-033", d: 6, q: "Which bird is known for the longest yearly migration of any animal?", o: ["Arctic tern", "Bar-headed goose", "Siberian crane", "White stork"], f: "The Arctic tern flies between Arctic breeding grounds and Antarctic waters, covering over 70,000 km a year." },
+
+  // ── d7 ──
+  { id: "nat-034", d: 7, q: "Which is the only ape found in India?", o: ["Hoolock gibbon", "Lion-tailed macaque", "Nilgiri langur", "Golden langur"], f: "The hoolock gibbon of Northeast India's forests is the country's only ape, famous for its loud whooping duets." },
+  { id: "nat-035", d: 7, q: "Which of these is NOT one of India's 'Big Four' venomous snakes?", o: ["King cobra", "Common krait", "Russell's viper", "Saw-scaled viper"], f: "The Big Four are the spectacled cobra, common krait, Russell's viper and saw-scaled viper; the king cobra is not among them." },
+  { id: "nat-036", d: 7, q: "Which mythical creature is the official national animal of Scotland?", o: ["Unicorn", "Dragon", "Griffin", "Phoenix"], f: "Scotland's national animal is the unicorn, a symbol of purity and power that appears on the Scottish royal coat of arms." },
+  { id: "nat-037", d: 7, q: "The critically endangered Great Indian Bustard is the state bird of which state?", o: ["Rajasthan", "Gujarat", "Maharashtra", "Karnataka"], f: "The Great Indian Bustard, or godawan, is Rajasthan's state bird; most survivors live around Desert National Park near Jaisalmer." },
+  { id: "nat-038", d: 7, q: "Dachigam National Park near Srinagar is the main refuge of which deer?", o: ["Hangul", "Sangai", "Barasingha", "Chital"], f: "Dachigam National Park is the main refuge of the hangul, or Kashmir stag, a rare red deer of the Kashmir Valley." },
+  { id: "nat-039", d: 7, q: "The Neelakurinji shrub, which turns the hills of Munnar blue, blooms once in how many years?", o: ["12 years", "6 years", "10 years", "15 years"], f: "Neelakurinji blooms en masse just once every 12 years, carpeting the Western Ghats hills around Munnar in blue." },
+
+  // ── d8 ──
+  { id: "nat-040", d: 8, q: "The pygmy hog, the world's smallest wild pig, is found in the wild today in which Indian state?", o: ["Assam", "Kerala", "Odisha", "Uttarakhand"], f: "The pygmy hog, only about 25 cm tall, survives in Assam's grasslands, including Manas National Park." },
+  { id: "nat-041", d: 8, q: "Which nocturnal parrot of New Zealand is the world's only flightless parrot?", o: ["Kakapo", "Kea", "Macaw", "Cockatoo"], f: "The kakapo of New Zealand is the world's only flightless parrot and also the heaviest, weighing up to about 4 kg." },
+  { id: "nat-042", d: 8, q: "Animals that are most active at dawn and dusk are described as what?", o: ["Crepuscular", "Nocturnal", "Diurnal", "Arboreal"], f: "Crepuscular animals, such as many deer and rabbits, are most active in the twilight hours of dawn and dusk." },
+  { id: "nat-043", d: 8, q: "The takin, a goat-antelope, is the national animal of which country?", o: ["Bhutan", "Nepal", "Mongolia", "Myanmar"], f: "Bhutan's national animal is the takin; legend says the saint Drukpa Kunley created it from a goat's head and a cow's bones." },
+  { id: "nat-044", d: 8, q: "Which 'living fossil' fish, thought extinct for millions of years, was found alive off South Africa in 1938?", o: ["Coelacanth", "Lungfish", "Arapaima", "Sturgeon"], f: "The coelacanth, known only from fossils, was found alive off South Africa in 1938 — a lineage thought extinct for 66 million years." },
+
+  // ── d9 ──
+  { id: "nat-045", d: 9, q: "In 2015, Maharashtra became the first Indian state to name a state butterfly. Which one?", o: ["Blue Mormon", "Southern Birdwing", "Common Jezebel", "Crimson Rose"], f: "Maharashtra chose the Blue Mormon, a large black-and-blue swallowtail of the Western Ghats, as India's first state butterfly in 2015." },
+  { id: "nat-046", d: 9, q: "Nagaland's Doyang reservoir is a famous autumn stopover for which migratory bird?", o: ["Amur falcon", "Bar-headed goose", "Siberian crane", "Greater flamingo"], f: "Lakhs of Amur falcons roost near Nagaland's Doyang reservoir each autumn on their journey from East Asia to southern Africa." },
+  { id: "nat-047", d: 9, q: "Which primates are the only venomous primates in the world?", o: ["Slow lorises", "Tarsiers", "Marmosets", "Langurs"], f: "Slow lorises are the only venomous primates; they mix secretions from a gland near the elbow with saliva to deliver a toxic bite." },
+  { id: "nat-048", d: 9, q: "Which marine mammal has the densest fur of any animal, instead of a layer of blubber?", o: ["Sea otter", "Harbour seal", "Walrus", "Sea lion"], f: "The sea otter has the densest fur of any animal — up to about a million hairs per square inch — keeping it warm without blubber." },
+
+  // ── d10 ──
+  { id: "nat-049", d: 10, q: "Jerdon's courser, a nocturnal bird rediscovered in 1986 after decades presumed extinct, is endemic to which state?", o: ["Andhra Pradesh", "Karnataka", "Odisha", "Gujarat"], f: "Jerdon's courser, rediscovered in Andhra Pradesh in 1986, lives in the scrub jungle of the Sri Lankamalleswara Wildlife Sanctuary." },
+  { id: "nat-050", d: 10, q: "Which Indian frog, whose closest relatives live in the Seychelles, spends most of its life underground?", o: ["Purple frog", "Indian bullfrog", "Malabar gliding frog", "Dancing frog"], f: "The purple frog of the Western Ghats, described only in 2003, lives underground and surfaces for a few weeks in the monsoon to breed." },
+];

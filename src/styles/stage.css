@@ -1,0 +1,201 @@
+@property --c1 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #7b3df7;
+}
+@property --c2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #2f5bff;
+}
+@property --c3 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #45d4ff;
+}
+@property --beam {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.5;
+}
+@property --spot {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.7;
+}
+@property --floor {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.8;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--bg-0);
+  transition: --c1 1.2s ease, --c2 1.2s ease, --c3 1.2s ease, --beam 1.2s ease, --spot 1.2s ease, --floor 1.2s ease;
+}
+
+.stage[data-mood="menu"] { --c1: #7b3df7; --c2: #2f5bff; --c3: #45d4ff; --beam: 0.55; --spot: 0.8; --floor: 0.85; }
+.stage[data-mood="calm"] { --c1: #4b2ad6; --c2: #1d3fd8; --c3: #3aa8ff; --beam: 0.32; --spot: 0.5; --floor: 0.65; }
+.stage[data-mood="tense"] { --c1: #a3164a; --c2: #3b1fb0; --c3: #ff5f7a; --beam: 0.34; --spot: 0.42; --floor: 0.55; }
+.stage[data-mood="suspense"] { --c1: #c2410c; --c2: #3b0f6e; --c3: #ff9d2e; --beam: 0.18; --spot: 0.28; --floor: 0.5; }
+.stage[data-mood="correct"] { --c1: #16a34a; --c2: #1d3fd8; --c3: #4ade80; --beam: 0.6; --spot: 0.85; --floor: 0.95; }
+.stage[data-mood="wrong"] { --c1: #b91c1c; --c2: #2a0f5e; --c3: #ff4d5e; --beam: 0.22; --spot: 0.3; --floor: 0.5; }
+.stage[data-mood="celebrate"] { --c1: #f59e0b; --c2: #7c3aed; --c3: #ffe08a; --beam: 0.9; --spot: 1; --floor: 1; }
+.stage[data-mood="fff"] { --c1: #0e7490; --c2: #4338ca; --c3: #22d3ee; --beam: 0.5; --spot: 0.75; --floor: 0.85; }
+.stage[data-mood="dark"] { --c1: #23206b; --c2: #0b0a2a; --c3: #8b8cff; --beam: 0.1; --spot: 1; --floor: 0.35; }
+
+.stage__base {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(90% 70% at 50% 108%, color-mix(in srgb, var(--c1) 55%, transparent) 0%, transparent 70%),
+    radial-gradient(70% 55% at 50% -12%, color-mix(in srgb, var(--c2) 45%, transparent) 0%, transparent 70%),
+    radial-gradient(55% 60% at -5% 55%, color-mix(in srgb, var(--c2) 22%, transparent), transparent 70%),
+    radial-gradient(55% 60% at 105% 55%, color-mix(in srgb, var(--c1) 22%, transparent), transparent 70%),
+    linear-gradient(180deg, #07052c 0%, #03021a 62%, #05031f 100%);
+}
+
+.stage__beams {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  width: 240vmax;
+  height: 240vmax;
+  margin: -120vmax 0 0 -120vmax;
+  opacity: var(--beam);
+  background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--c3) 30%, transparent) 0deg, transparent 5deg, transparent 15deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, 0.55) 16%, transparent 44%);
+  mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, 0.55) 16%, transparent 44%);
+  animation: stage-spin 140s linear infinite;
+  will-change: transform;
+}
+.stage__beams--b {
+  background: repeating-conic-gradient(from 7deg, color-mix(in srgb, var(--c1) 34%, transparent) 0deg, transparent 4deg, transparent 22deg);
+  animation-duration: 190s;
+  animation-direction: reverse;
+}
+
+@keyframes stage-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.stage__rings {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: min(118vmin, 1100px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  color: color-mix(in srgb, var(--c3) 70%, white);
+  opacity: 0.1;
+}
+.stage__rings svg {
+  width: 100%;
+  height: 100%;
+  animation: stage-spin 220s linear infinite;
+}
+
+.stage__spots {
+  position: absolute;
+  inset: 0;
+  opacity: var(--spot);
+  mix-blend-mode: screen;
+}
+.stage__spots i {
+  position: absolute;
+  top: -12vh;
+  left: var(--x);
+  width: 26vw;
+  height: 125vh;
+  transform-origin: 50% 0;
+  transform: rotate(var(--r));
+  background: linear-gradient(180deg, color-mix(in srgb, white 60%, var(--c3)) 0%, color-mix(in srgb, var(--c3) 30%, transparent) 30%, transparent 78%);
+  clip-path: polygon(47% 0, 53% 0, 100% 100%, 0 100%);
+  opacity: 0.2;
+  animation: stage-sway var(--d) ease-in-out infinite alternate;
+}
+@keyframes stage-sway {
+  from {
+    transform: rotate(calc(var(--r) - 7deg));
+  }
+  to {
+    transform: rotate(calc(var(--r) + 7deg));
+  }
+}
+
+.stage__floor {
+  position: absolute;
+  left: 50%;
+  bottom: -40vh;
+  width: 150vw;
+  height: 72vh;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  opacity: var(--floor);
+  background:
+    radial-gradient(closest-side, color-mix(in srgb, var(--c3) 42%, transparent) 0%, color-mix(in srgb, var(--c1) 30%, transparent) 45%, transparent 100%),
+    repeating-radial-gradient(closest-side, transparent 0 26px, color-mix(in srgb, var(--c3) 16%, transparent) 27px 28px);
+}
+
+.stage__dust span {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px 1px color-mix(in srgb, var(--c3) 80%, white);
+  opacity: 0;
+  animation: stage-twinkle var(--d) ease-in-out var(--delay) infinite;
+}
+@keyframes stage-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translateY(-16px) scale(1);
+  }
+}
+
+.stage__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(125% 95% at 50% 45%, transparent 52%, rgba(0, 0, 0, 0.7) 100%);
+}
+
+.stage__flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: stage-flash 1.5s var(--ease-out) forwards;
+}
+.stage__flash[data-kind="correct"] {
+  background: radial-gradient(70% 60% at 50% 72%, rgba(47, 220, 114, 0.5), transparent 70%);
+}
+.stage__flash[data-kind="wrong"] {
+  background: radial-gradient(70% 60% at 50% 72%, rgba(255, 77, 94, 0.55), transparent 70%);
+}
+.stage__flash[data-kind="gold"] {
+  background: radial-gradient(80% 70% at 50% 50%, rgba(255, 214, 120, 0.6), transparent 70%);
+}
+.stage__flash[data-kind="white"] {
+  background: rgba(255, 255, 255, 0.45);
+}
+@keyframes stage-flash {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

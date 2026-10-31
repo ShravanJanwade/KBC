@@ -1,0 +1,62 @@
+// Each check gets { game, history, rating, iq } after the game has been recorded.
+// game.lifelines maps each used lifeline to the level it was used on.
+export const ACHIEVEMENTS = [
+  { id: "first-game", name: "Pehla Kadam", desc: "Play your first game", icon: "Footprints", check: () => true },
+  { id: "padaav-1", name: "Pehla Padaav", desc: "Cross the ₹10,000 milestone", icon: "Flag", check: ({ game }) => game.correct >= 5 },
+  { id: "padaav-2", name: "Doosra Padaav", desc: "Cross the ₹3,20,000 milestone", icon: "Flag", check: ({ game }) => game.correct >= 10 },
+  { id: "lakhpati", name: "Lakhpati", desc: "Take home ₹1 lakh or more", icon: "Coins", check: ({ game }) => game.prize >= 100000 },
+  { id: "crorepati", name: "Crorepati", desc: "Answer the ₹1 crore question", icon: "Crown", check: ({ game }) => game.correct >= 15 },
+  { id: "jackpot", name: "Saat Crore", desc: "Win the ₹7 crore jackpot", icon: "Gem", check: ({ game }) => game.correct >= 16 },
+  {
+    id: "no-lifeline",
+    name: "Bina Sahara",
+    desc: "Reach ₹3,20,000 without using a lifeline",
+    icon: "ShieldCheck",
+    check: ({ game }) => game.correct >= 10 && Object.values(game.lifelines || {}).every((level) => level > 10),
+  },
+  {
+    id: "lightning",
+    name: "Bijli",
+    desc: "Answer 5 questions in under 5 seconds each in one game",
+    icon: "Zap",
+    check: ({ game }) => game.questions.filter((q) => q.correct && q.timeMs < 5000).length >= 5,
+  },
+  {
+    id: "clutch",
+    name: "Aakhri Pal",
+    desc: "Answer correctly with 3 seconds or less on the clock",
+    icon: "Hourglass",
+    check: ({ game }) => game.questions.some((q) => q.correct && q.timeLeft != null && q.timeLeft <= 3),
+  },
+  {
+    id: "wise-quit",
+    name: "Sahi Faisla",
+    desc: "Walk away when your guess would have been wrong",
+    icon: "Hand",
+    check: ({ game }) => game.outcome === "walked" && game.guessCorrect === false,
+  },
+  {
+    id: "phone-trust",
+    name: "Dost Ho Toh Aisa",
+    desc: "Follow your friend's advice and get it right",
+    icon: "PhoneCall",
+    check: ({ game }) => game.questions.some((q) => q.correct && q.phoneSuggested != null && q.phoneSuggested === q.chosen),
+  },
+  {
+    id: "fff-speed",
+    name: "Fastest Finger",
+    desc: "Win Fastest Finger First in under 6 seconds",
+    icon: "Timer",
+    check: ({ game }) => game.fff?.won && game.fff.timeMs < 6000,
+  },
+  {
+    id: "all-rounder",
+    name: "All-Rounder",
+    desc: "Answer correctly in 10 different topics",
+    icon: "Sparkles",
+    check: ({ rating }) => Object.values(rating.cats || {}).filter((c) => c.right > 0).length >= 10,
+  },
+  { id: "marathon", name: "Marathon", desc: "Play 10 games", icon: "CalendarDays", check: ({ history }) => history.length >= 10 },
+  { id: "gyani", name: "Vidwan", desc: "Reach a Quiz IQ of 1150", icon: "Brain", check: ({ iq }) => iq >= 1150 },
+  { id: "mahagyani", name: "Mahagyani", desc: "Reach a Quiz IQ of 1300", icon: "GraduationCap", check: ({ iq }) => iq >= 1300 },
+];
