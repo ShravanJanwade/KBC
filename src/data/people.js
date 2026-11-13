@@ -13,8 +13,8 @@ export const FRIENDS = [
     strengths: ["india-history", "world-history", "polity", "culture"],
     expert: 2.7,
     general: 0.7,
-    voice: { gender: "female", rate: 1.03, pitch: 1.05 },
-    greeting: "Hello? Haan, bolo! Is this the KBC call?",
+    voice: { gender: "female", rate: 1.04, pitch: 1.04, slot: 0, hindi: false },
+    greeting: { text: "Hello? Haan ji, namaste! Bataiye, sawaal kya hai?", hi: "हेलो? हाँ जी, नमस्ते! बताइए, सवाल क्या है?", en: "Hello? Yes, namaste! Tell me, what's the question?" },
     avatar: { skin: 3, hair: "long", hairColor: 0, outfit: "saree", outfitColor: 6, bg: 3, glasses: true, bindi: true, earrings: true, beard: "none" },
   },
   {
@@ -28,8 +28,8 @@ export const FRIENDS = [
     strengths: ["cricket", "sports", "cinema", "personalities"],
     expert: 2.7,
     general: 0.5,
-    voice: { gender: "male", rate: 1.08, pitch: 1 },
-    greeting: "Arre bhai! Main TV pe dekh raha hoon. Bol, jaldi!",
+    voice: { gender: "male", rate: 1.1, pitch: 1.08, slot: 1, hindi: true },
+    greeting: { text: "Arre bhai! Main TV pe hi dekh raha tha. Bol, jaldi bol!", hi: "अरे भाई! मैं टीवी पे ही देख रहा था। बोल, जल्दी बोल!", en: "Hey! I was watching you on TV. Go on, quickly!" },
     avatar: { skin: 1, hair: "spiky", hairColor: 0, outfit: "tee", outfitColor: 0, bg: 2, glasses: false, beard: "stubble" },
   },
   {
@@ -43,8 +43,8 @@ export const FRIENDS = [
     strengths: ["science", "health", "nature", "space"],
     expert: 2.8,
     general: 0.8,
-    voice: { gender: "female", rate: 0.98, pitch: 1 },
-    greeting: "Hello! Yes, I'm here. Read out the question slowly.",
+    voice: { gender: "female", rate: 0.98, pitch: 0.98, slot: 1, hindi: false },
+    greeting: { text: "Hello! Yes, I'm here. Read the question slowly.", hi: "हेलो! हाँ, मैं सुन रही हूँ। सवाल आराम से पढ़िए।", en: "Hello! Yes, I'm here. Read the question slowly." },
     avatar: { skin: 2, hair: "bun", hairColor: 1, outfit: "blazer", outfitColor: 3, bg: 1, glasses: true, earrings: true, beard: "none" },
   },
   {
@@ -58,8 +58,8 @@ export const FRIENDS = [
     strengths: ["cinema", "music-arts", "literature", "everyday"],
     expert: 2.7,
     general: 0.6,
-    voice: { gender: "male", rate: 1.02, pitch: 0.95 },
-    greeting: "Yo! Main ready hoon, picture abhi baaki hai mere dost!",
+    voice: { gender: "male", rate: 1.03, pitch: 0.98, slot: 2, hindi: false },
+    greeting: { text: "Hey! Main ready hoon. Picture abhi baaki hai, mere dost!", hi: "हे! मैं रेडी हूँ। पिक्चर अभी बाक़ी है, मेरे दोस्त!", en: "Hey! I'm ready. The picture isn't over yet, my friend!" },
     avatar: { skin: 3, hair: "curly", hairColor: 0, outfit: "hoodie", outfitColor: 4, bg: 4, glasses: false, beard: "full" },
   },
   {
@@ -73,8 +73,8 @@ export const FRIENDS = [
     strengths: ["technology", "math", "economy", "space"],
     expert: 2.7,
     general: 0.7,
-    voice: { gender: "male", rate: 1.06, pitch: 1.05 },
-    greeting: "Hey! I've got my laptop open. Shoot.",
+    voice: { gender: "male", rate: 1.07, pitch: 1.1, slot: 3, hindi: false },
+    greeting: { text: "Hey! Laptop khula hai, poochho.", hi: "हे! लैपटॉप खुला है, पूछो।", en: "Hey! I've got my laptop open. Shoot." },
     avatar: { skin: 4, hair: "side", hairColor: 0, outfit: "tee", outfitColor: 7, bg: 0, glasses: true, beard: "none" },
   },
   {
@@ -88,8 +88,8 @@ export const FRIENDS = [
     strengths: ["mythology", "culture", "literature", "geography"],
     expert: 2.9,
     general: 0.3,
-    voice: { gender: "female", rate: 0.9, pitch: 0.9 },
-    greeting: "Haan beta, Dadi bol rahi hoon. Ghabrao mat, poochho.",
+    voice: { gender: "female", rate: 0.96, pitch: 0.88, slot: 0, hindi: true },
+    greeting: { text: "Haan beta, Dadi bol rahi hoon. Ghabrao mat... poochho.", hi: "हाँ बेटा, दादी बोल रही हूँ। घबराओ मत... पूछो।", en: "Yes dear, it's Dadi. Don't worry... ask me." },
     avatar: { skin: 2, hair: "bun", hairColor: 4, outfit: "saree", outfitColor: 0, bg: 2, glasses: true, bindi: true, earrings: true, beard: "none" },
   },
 ];
@@ -98,7 +98,7 @@ export const EXPERT = {
   name: "Dr. Vidya Raghavan",
   title: "Quiz Master · KBC Expert Panel",
   ability: 4.2,
-  voice: { gender: "female", rate: 1, pitch: 1 },
+  voice: { gender: "female", rate: 1, pitch: 1.02, slot: 0, hindi: false },
   avatar: { skin: 2, hair: "bob", hairColor: 0, outfit: "blazer", outfitColor: 7, bg: 1, glasses: true, earrings: true, beard: "none" },
 };
 

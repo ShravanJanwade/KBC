@@ -496,3 +496,8 @@
     padding: 8px 12px;
   }
 }
+
+.menu__host {
+  min-height: 46px;
+  margin-top: 6px;
+}

@@ -27,14 +27,13 @@ import { fiftyFifty } from "../../engine/lifelines";
 import { updateRating, iqOf } from "../../engine/rating";
 import { audio } from "../../audio/engine";
 import { sfx, startHeartbeat, stopHeartbeat } from "../../audio/synth";
-import { say, cancelSpeech } from "../../audio/speech";
+import { speakLine, speakEnglish, cancelSpeech, hostWho, speechSupported } from "../../audio/speech";
 import { LETTERS, formatINR, shortINR } from "../../lib/format";
-import { sleep, uid } from "../../lib/random";
+import { uid } from "../../lib/random";
 import "../../styles/hotseat.css";
 import "../../styles/lifelines.css";
 
 const ANSWERING = new Set(["answer", "confirm"]);
-const HOST_VOICE = { gender: "male", rate: 0.98, pitch: 0.92 };
 const bedFor = (level) => (level <= 7 ? "bedEasy" : "bedHard");
 
 export default function HotSeat({ fff, onFinish }) {
@@ -89,8 +88,6 @@ export default function HotSeat({ fff, onFinish }) {
   const timer = useRef({ running: false, deadline: 0, remaining: 0, lastWhole: null });
   const live = useRef({});
   live.current = { level, q, phase, removed, lifelines, selected, timeLimit, settings, panel, endOutcome, overlay };
-  if (import.meta.env.DEV) window.__kbc = { live: live.current, game: game.current, timer: timer.current };
-
   // ---------- answer clock (excludes time spent inside lifelines) ----------
   const clockStart = () => (game.current.clock = { start: performance.now(), paused: 0, pausedAt: 0 });
   const clockPause = () => {
@@ -141,11 +138,16 @@ export default function HotSeat({ fff, onFinish }) {
     stopHeartbeat();
   };
 
-  const showLine = (l, speak = false) => {
-    if (!l) return;
+  // Show a host line in the lower third and, with narration on, speak it. Resolves when the host
+  // has finished, so sequences can wait for him (resolves at once when narration is off).
+  const hostSay = (l, mood) => {
+    if (!l) return Promise.resolve();
     setLine({ ...l, key: Math.random() });
-    if (speak && live.current.settings.hostVoice) say(l.say, HOST_VOICE);
+    const s = live.current.settings;
+    if (!s.hostVoice) return Promise.resolve();
+    return speakLine(l, hostWho(), { language: s.language, mood });
   };
+  const voiceOn = () => !!live.current.settings.hostVoice && speechSupported;
 
   const handlers = useRef({});
 
@@ -164,6 +166,7 @@ export default function HotSeat({ fff, onFinish }) {
           if (whole === 10) {
             startHeartbeat(100, 0.75);
             setMood("tense");
+            if (live.current.phase === "answer" && !live.current.overlay) hostSay(host.clockLow());
           }
           if (whole <= 5) sfx.warnBeep();
         }
@@ -212,6 +215,15 @@ export default function HotSeat({ fff, onFinish }) {
   };
 
   // ---------- flow ----------
+  // Narration can always be skipped: pressing an answer key, Space/Enter or "Skip" during the
+  // host's reading fast-forwards to the answering phase.
+  const skip = useRef(false);
+  const skipNarration = () => {
+    if (!["announce", "reveal"].includes(live.current.phase)) return;
+    skip.current = true;
+    cancelSpeech();
+  };
+
   const beginQuestion = (lvl, { flip = false } = {}) => {
     const g = game.current;
     const s = live.current.settings;
@@ -255,12 +267,14 @@ export default function HotSeat({ fff, onFinish }) {
     setMood(lvl >= 15 ? "dark" : "calm");
     audio.music(bedFor(lvl), { fade: 1 });
 
+    skip.current = false;
     run(async (wait, alive) => {
+      const voice = voiceOn();
       if (!flip) {
         sfx.ladderUp();
-        showLine(host.question(lvl, amountFor(lvl)), true);
-        await wait(lvl >= 15 ? 700 : 1300);
-        if (lvl >= 15) {
+        const intro = hostSay(host.questionIntro(lvl, amountFor(lvl), profile.name));
+        await Promise.all([voice ? intro : null, wait(lvl >= 15 ? 700 : 1300)]);
+        if (lvl >= 15 && !skip.current) {
           audio.stopMusic(0.5);
           sfx.drumroll(2.4);
           await wait(2400);
@@ -271,25 +285,33 @@ export default function HotSeat({ fff, onFinish }) {
           await wait(500);
         }
       } else {
-        await wait(250);
+        await Promise.all([voice ? hostSay(host.lifeline.flip()) : null, wait(300)]);
       }
+      if (!alive()) return;
       setPhase("reveal");
       setQVisible(true);
       sfx.reveal();
-      const spoken = s.hostVoice ? say(pq.q, HOST_VOICE) : null;
-      await wait(1150);
+      if (voice && !skip.current) {
+        await wait(420);
+        await speakEnglish(pq.q, hostWho(), { mood: lvl >= 11 ? "tense" : "calm" });
+      } else {
+        await wait(skip.current ? 150 : 1150);
+      }
       for (let i = 1; i <= 4; i++) {
+        if (!alive()) return;
         setShown(i);
         sfx.optionIn();
-        await wait(lvl >= 15 ? 650 : 420);
+        if (skip.current) continue;
+        if (voice) {
+          await speakEnglish(`${LETTERS[i - 1]}| ${pq.options[i - 1]}`, hostWho(), { mood: "calm" });
+          await wait(110);
+        } else {
+          await wait(lvl >= 15 ? 650 : 420);
+        }
       }
-      if (spoken) await Promise.race([spoken, sleep(6000)]);
       if (!alive()) return;
-      const cat = CATEGORY_BY_ID[raw.c];
-      if (profile.favourites?.includes(raw.c) && Math.random() < 0.5) showLine(host.favTopic(cat.name));
-      else if (g.mood > 0.02 && lvl > 1) showLine(host.breather());
-      else if (g.fastStreak >= 3) showLine(host.streak());
-      else if (lvl === TOTAL_LEVELS) showLine(host.jackpotWarn());
+      if (limit && voice && !skip.current && (lvl === 1 || lvl === 6 || Math.random() < 0.3)) await hostSay(host.startClock());
+      if (!alive()) return;
       setPhase("answer");
       clockStart();
       if (limit) startTimer(limit);
@@ -297,13 +319,18 @@ export default function HotSeat({ fff, onFinish }) {
   };
 
   const pickOption = (i) => {
-    const { phase: ph, removed: rem, selected: sel } = live.current;
-    if (!ANSWERING.has(ph) || rem.includes(i) || overlay) return;
+    const { phase: ph, removed: rem, selected: sel, level: lvl } = live.current;
+    if (ph === "announce" || ph === "reveal") return skipNarration();
+    if (!ANSWERING.has(ph) || rem.includes(i) || live.current.overlay) return;
     if (!live.current.settings.confirmLock || (ph === "confirm" && sel === i)) return lockAnswer(i);
     sfx.select();
     setSelected(i);
     setPhase("confirm");
-    showLine(host.confirm(LETTERS[i]));
+    const confirmLine = () => live.current.phase === "confirm" && live.current.selected === i && hostSay(host.confirm(LETTERS[i]));
+    const quick = sel == null && lvl >= 4 && clockElapsed() < 2500;
+    if (voiceOn() && sel != null && sel !== i && Math.random() < 0.5) hostSay(host.changed()).then(confirmLine);
+    else if (voiceOn() && quick && Math.random() < 0.6) hostSay(host.quickPick()).then(confirmLine);
+    else hostSay(host.confirm(LETTERS[i]));
   };
 
   const cancelSelection = () => {
@@ -324,21 +351,29 @@ export default function HotSeat({ fff, onFinish }) {
     setLocked(i);
     setPhase("locked");
     sfx.lock();
-    showLine(host.locked(LETTERS[i]), true);
+    const lockLine = hostSay(host.locked(LETTERS[i]));
     audio.music("suspense", { fade: 0.35, fadeOut: 0.3 });
     setMood("suspense");
     startHeartbeat(lvl >= 11 ? 64 : 78, lvl >= 11 ? 1 : 0.75);
     const correct = i === cur.answer;
     const timeMs = Math.round(clockElapsed());
 
-    run(async (wait) => {
+    run(async (wait, alive) => {
+      const t0 = performance.now();
       const ms = suspenseMs(lvl) + Math.random() * (lvl >= 11 ? 1400 : 500);
+      if (voiceOn()) {
+        await lockLine;
+        if (!alive()) return;
+        if (lvl >= 8) await hostSay(host.suspense(), "whisper");
+        if (!alive()) return;
+      }
+      const left = Math.max(lvl >= 13 ? 1700 : 350, ms - (performance.now() - t0));
       if (lvl >= 13) {
-        await wait(ms - 1600);
+        await wait(left - 1600);
         sfx.riser(1.5);
         await wait(1600);
       } else {
-        await wait(ms);
+        await wait(left);
       }
       stopHeartbeat();
       audio.stopMusic(0.12);
@@ -348,35 +383,38 @@ export default function HotSeat({ fff, onFinish }) {
       if (correct) {
         g.fastStreak = fast && !g.qLifelines.length ? g.fastStreak + 1 : 0;
         g.mood = g.qLifelines.length || (leftSecs != null && leftSecs < 6) ? 0.05 : g.fastStreak >= 3 ? -0.04 : 0;
-        revealCorrect(lvl);
+        revealCorrect(lvl, i);
       } else {
         revealWrong(lvl);
       }
     });
   };
 
-  const revealCorrect = (lvl) => {
+  const revealCorrect = (lvl, chosen) => {
+    const g = game.current;
     setPhase("correct");
     audio.play("correct");
     flash("correct");
     setMood("correct");
     sfx.sparkle(12, 0.8);
-    showLine(host.correct(amountFor(lvl)), true);
-    run(async (wait) => {
-      await wait(1500);
+    const friend = g.phoneSuggestion === chosen ? g.phoneFriend : null;
+    const said = hostSay(host.correct(lvl, amountFor(lvl), { lifeline: g.qLifelines.length > 0, friend, streak: g.fastStreak }));
+    run(async (wait, alive) => {
+      await Promise.all([voiceOn() ? said : null, wait(1500)]);
+      if (!alive()) return;
       if (lvl === TOTAL_LEVELS) {
-        showLine(host.jackpot(), true);
         setMood("celebrate");
+        hostSay(host.jackpot());
         return setOverlay("jackpot");
       }
       if (lvl === 15) {
-        showLine(host.crore(), true);
         setMood("celebrate");
+        hostSay(host.crore());
         return setOverlay("crore");
       }
       if (lvl === 5 || lvl === 10) {
-        showLine(host.milestone(lvl, amountFor(lvl)), true);
         setMood("celebrate");
+        hostSay(host.milestone(lvl));
         return setOverlay("milestone");
       }
       setPanel(true);
@@ -388,12 +426,13 @@ export default function HotSeat({ fff, onFinish }) {
     audio.play("wrong");
     flash("wrong");
     setMood("wrong");
-    showLine(host.wrong(safeAmount(lvl)), true);
     setEndOutcome("wrong");
-    run(async (wait) => {
+    const said = hostSay(host.wrong(LETTERS[live.current.q.answer], safeAmount(lvl)));
+    run(async (wait, alive) => {
       await wait(800);
       setFlashAnswer(true);
-      await wait(1800);
+      await Promise.all([voiceOn() ? said : null, wait(1800)]);
+      if (!alive()) return;
       setPanel(true);
     });
   };
@@ -410,14 +449,15 @@ export default function HotSeat({ fff, onFinish }) {
     flash("wrong");
     setMood("wrong");
     const banked = game.current.records.filter((r) => r.correct).length;
-    showLine(host.timeUp(amountFor(banked)), true);
+    const said = hostSay(host.timeUp(amountFor(banked)));
     recordQuestion({ timedOut: true, timeLeft: 0 });
     applyRating(false, { timedOut: true });
     setEndOutcome("timeout");
-    run(async (wait) => {
+    run(async (wait, alive) => {
       await wait(900);
       setFlashAnswer(true);
-      await wait(1600);
+      await Promise.all([voiceOn() ? said : null, wait(1600)]);
+      if (!alive()) return;
       setPanel(true);
     });
   };
@@ -428,6 +468,7 @@ export default function HotSeat({ fff, onFinish }) {
     pauseTimer();
     clockPause();
     setOverlay("quit");
+    hostSay(host.quitAsk(amountFor(game.current.records.filter((r) => r.correct).length)));
   };
   const cancelQuit = () => {
     setOverlay(null);
@@ -440,7 +481,7 @@ export default function HotSeat({ fff, onFinish }) {
     setSelected(null);
     setPhase("guess");
     setMood("calm");
-    showLine(host.quitGuess(), true);
+    hostSay(host.quitGuess());
   };
   const guessAnswer = (i) => {
     const { phase: ph, q: cur, removed: rem } = live.current;
@@ -452,20 +493,22 @@ export default function HotSeat({ fff, onFinish }) {
     sfx.lock();
     recordQuestion({ walked: true, guess: i });
     setEndOutcome("walked");
-    run(async (wait) => {
+    run(async (wait, alive) => {
       await wait(1700);
       audio.stopMusic(0.4);
       setPhase("walked");
       setFlashAnswer(true);
       if (right) sfx.ding();
       else sfx.error();
-      showLine(host.guessResult(right), true);
-      await wait(1400);
+      const said = hostSay(host.guessResult(right));
+      await Promise.all([voiceOn() ? said : null, wait(1400)]);
+      if (!alive()) return;
       setPanel(true);
     });
   };
   const skipGuess = () => {
     if (live.current.phase !== "guess") return;
+    cancelSpeech();
     recordQuestion({ walked: true });
     setEndOutcome("walked");
     setPhase("walked");
@@ -489,7 +532,8 @@ export default function HotSeat({ fff, onFinish }) {
     if (type === "fifty") {
       pauseTimer();
       clockPause();
-      showLine(host.lifeline.fifty(), true);
+      const said = hostSay(host.lifeline.fifty());
+      if (voiceOn()) said.then(() => ANSWERING.has(live.current.phase) && !live.current.overlay && hostSay(host.lifeline.fiftyDone()));
       audio.play("fifty");
       const gone = fiftyFifty(cur.answer, rem);
       setTimeout(() => {
@@ -506,7 +550,6 @@ export default function HotSeat({ fff, onFinish }) {
     if (type === "flip") {
       stopTimer();
       clockPause();
-      showLine(host.lifeline.flip(), true);
       recordQuestion({ flipped: true });
       sfx.whoosh("up", 0.6);
       setFlipping(true);
@@ -516,16 +559,21 @@ export default function HotSeat({ fff, onFinish }) {
     }
     pauseTimer();
     clockPause();
-    if (type === "poll") showLine(host.lifeline.poll(), true);
-    if (type === "expert") showLine(host.lifeline.expert(), true);
+    if (type === "poll") hostSay(host.lifeline.poll());
+    if (type === "expert") hostSay(host.lifeline.expert());
+    if (type === "phone") hostSay(host.lifeline.phone());
     setOverlay(type);
   };
 
   const closeLifeline = (type, result) => {
     setOverlay(null);
     if (result) setHints((h) => [...h, { type, ...result }]);
-    if (type === "phone" && result) game.current.phoneSuggestion = result.index;
-    if (type === "phone" && result) showLine(host.lifeline.phone(result.friend.first));
+    if (type === "phone" && result) {
+      game.current.phoneSuggestion = result.index;
+      game.current.phoneFriend = result.friend.first;
+      hostSay(host.lifeline.phoneAfter(result.friend.first));
+    }
+    if (type === "expert" && result) hostSay(host.lifeline.expertAfter());
     audio.music(bedFor(live.current.level), { fade: 0.8 });
     resumeTimer();
     clockResume();
@@ -536,6 +584,7 @@ export default function HotSeat({ fff, onFinish }) {
     if (!ANSWERING.has(live.current.phase) || live.current.overlay) return;
     pauseTimer();
     clockPause();
+    cancelSpeech();
     audio.duck(0.35);
     setOverlay("pause");
   };
@@ -553,9 +602,14 @@ export default function HotSeat({ fff, onFinish }) {
     setMood("calm");
     if (live.current.level === FLIP_UNLOCK_AFTER) {
       setLifelines((l) => (l.flip === "locked" ? { ...l, flip: "ready" } : l));
-      showLine(host.flipUnlocked());
+      hostSay(host.flipUnlocked());
     }
     setPanel(true);
+  };
+
+  const openDecision = () => {
+    setOverlay("decision");
+    hostSay(host.jackpotWarn());
   };
 
   const next = () => {
@@ -614,14 +668,16 @@ export default function HotSeat({ fff, onFinish }) {
     audio.unlock();
     audio.music("letsPlay", { fade: 0.2 });
     setMood("celebrate");
-    showLine(host.welcome(profile.name, profile.city), true);
     sfx.applause(3, 0.5);
-    run(async (wait) => {
-      await wait(2900);
+    run(async (wait, alive) => {
+      const welcome = hostSay(host.welcome(profile.name, profile.city), "excited");
+      await Promise.all([voiceOn() ? welcome : null, wait(2900)]);
+      if (!alive()) return;
       setMood("calm");
       setIntroStep(1);
-      showLine(host.rules());
-      await wait(3000);
+      const rules = hostSay(host.rules());
+      await Promise.all([voiceOn() ? rules : null, wait(2600)]);
+      if (!alive()) return;
       beginQuestion(1);
     });
     return () => {
@@ -630,6 +686,15 @@ export default function HotSeat({ fff, onFinish }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // On untimed questions, the host nudges a player who has been thinking for a long while.
+  useEffect(() => {
+    if (phase !== "answer" || timeLimit || overlay) return;
+    const t = setTimeout(() => {
+      if (live.current.phase === "answer" && !live.current.overlay) hostSay(host.idle());
+    }, 28000);
+    return () => clearTimeout(t);
+  }, [phase, timeLimit, overlay, q]);
 
   // ---------- keyboard ----------
   const keys = useRef();
@@ -643,6 +708,10 @@ export default function HotSeat({ fff, onFinish }) {
       if (ph === "guess") guessAnswer(idx);
       else pickOption(idx);
       return;
+    }
+    if ((k === " " || k === "enter") && (ph === "announce" || ph === "reveal")) {
+      e.preventDefault();
+      return skipNarration();
     }
     if (k === "enter") {
       if (e.target?.tagName === "BUTTON") return;
@@ -761,7 +830,13 @@ export default function HotSeat({ fff, onFinish }) {
                   <CategoryIcon id={cat.id} size={14} /> {cat.name}
                 </motion.span>
               )}
-              <HintsDock hints={hints} />
+              {settings.hostVoice && (phase === "announce" || phase === "reveal") ? (
+                <Button variant="ghost" size="sm" icon={SkipForward} onClick={skipNarration} quiet>
+                  Skip <span className="kbd">Space</span>
+                </Button>
+              ) : (
+                <HintsDock hints={hints} />
+              )}
             </div>
             <QuestionBoard
               q={q}
@@ -794,8 +869,8 @@ export default function HotSeat({ fff, onFinish }) {
         {ladderOpen && <div className="hs__scrim" onClick={() => setLadderOpen(false)} />}
       </main>
 
-      {overlay === "poll" && q && <AudiencePoll q={q} removed={removed} onClose={(r) => closeLifeline("poll", r)} />}
-      {overlay === "phone" && q && <PhoneAFriend q={q} removed={removed} level={level} voice={settings.lifelineVoice} onClose={(r) => closeLifeline("phone", r)} />}
+      {overlay === "poll" && q && <AudiencePoll q={q} removed={removed} settings={settings} onClose={(r) => closeLifeline("poll", r)} />}
+      {overlay === "phone" && q && <PhoneAFriend q={q} removed={removed} level={level} settings={settings} playerName={profile.name} onClose={(r) => closeLifeline("phone", r)} />}
       {overlay === "expert" && q && <AskExpert q={q} removed={removed} voice={settings.lifelineVoice} onClose={(r) => closeLifeline("expert", r)} />}
       {overlay === "quit" && <QuitDialog amount={banked} onConfirm={confirmQuit} onCancel={cancelQuit} />}
       {overlay === "pause" && <PauseDialog settings={settings} updateSettings={updateSettings} canQuit={reached > 0} onResume={closePause} onQuit={() => (closePause(), openQuit())} />}
@@ -813,7 +888,7 @@ export default function HotSeat({ fff, onFinish }) {
       )}
       <AnimatePresence>
         {overlay === "milestone" && <MilestoneOverlay key="ms" level={level} onDone={afterMilestone} />}
-        {overlay === "crore" && <BigWinOverlay key="crore" name={profile.name} onDone={() => setOverlay("decision")} />}
+        {overlay === "crore" && <BigWinOverlay key="crore" name={profile.name} onDone={openDecision} />}
         {overlay === "jackpot" && <BigWinOverlay key="jackpot" jackpot name={profile.name} onDone={() => finish("won")} />}
       </AnimatePresence>
     </div>

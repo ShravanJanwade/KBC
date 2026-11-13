@@ -507,9 +507,13 @@
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(6px);
 }
-.caption--you {
+.caption--host {
   align-self: flex-end;
-  background: rgba(47, 107, 255, 0.5);
+  background: linear-gradient(90deg, rgba(60, 36, 140, 0.75), rgba(40, 22, 110, 0.7));
+  box-shadow: 0 0 0 1px rgba(246, 210, 122, 0.35) inset;
+}
+.caption--host .caption__who {
+  color: var(--gold-1);
 }
 .caption--friend {
   align-self: flex-start;

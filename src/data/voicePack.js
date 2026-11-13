@@ -1,0 +1,28 @@
+// The show's signature host moments that can be replaced by a recorded clip.
+// `id` matches the moment id carried by host lines (see data/host.js); `script` is what to say.
+export const VOICE_MOMENTS = [
+  { id: "splash", label: "Show opening", script: "Deviyon aur Sajjanon... swagat hai aapka, Kaun Banega Crorepati mein!" },
+  { id: "welcome", label: "Welcome to the hot seat", script: "Deviyon aur Sajjanon! Hot seat par swagat kijiye!" },
+  { id: "rules", label: "Let's begin", script: "Toh chaliye... khel shuru karte hain!" },
+  { id: "startClock", label: "Clock starts", script: "Aapka samay shuru hota hai... ab!" },
+  { id: "confirm", label: "Lock kiya jaye?", script: "Lock kiya jaye?" },
+  { id: "locked", label: "Computer ji", script: "Computer ji, lock kiya jaye." },
+  { id: "suspense", label: "Suspense", script: "Dekhte hain... kya yeh sahi jawab hai..." },
+  { id: "correct", label: "Correct answer", script: "Sahi jawab!" },
+  { id: "wrong", label: "Wrong answer", script: "Afsos... yeh galat jawab hai." },
+  { id: "padaav1", label: "First milestone", script: "Pehla padaav paar! Das hazaar rupaye!" },
+  { id: "padaav2", label: "Second milestone", script: "Doosra padaav! Teen lakh bees hazaar!" },
+  { id: "timeUp", label: "Time's up", script: "Samay samaapt!" },
+  { id: "lifeline.fifty", label: "50:50", script: "Computer ji, do galat jawab hata dijiye." },
+  { id: "lifeline.poll", label: "Audience poll", script: "Audience, apne keypad uthaiye aur vote kijiye!" },
+  { id: "lifeline.phone", label: "Phone a friend", script: "Chaliye, aapke dost ko phone lagaate hain." },
+  { id: "lifeline.expert", label: "Ask the expert", script: "Hamare visheshagya se poochhte hain." },
+  { id: "lifeline.flip", label: "Flip the question", script: "Naya sawaal, usi rakam ke liye!" },
+  { id: "croreQuestion", label: "₹1 crore question", script: "Ek crore rupaye ka sawaal... dil thaam ke baithiye." },
+  { id: "crore", label: "Crorepati!", script: "Ek... crore! Aap crorepati ban gaye hain!" },
+  { id: "jackpotQuestion", label: "₹7 crore question", script: "Saat... crore... ka sawaal!" },
+  { id: "jackpot", label: "₹7 crore won", script: "Saat... crore! Aapne itihaas rach diya hai!" },
+  { id: "quitAsk", label: "Walk away?", script: "Kya aap khel chhodna chahte hain?" },
+  { id: "transfer", label: "Prize transfer", script: "Ye gaye paise... aapke account mein!" },
+  { id: "goodbye", label: "Goodbye", script: "Bahut achha khele aap. Phir milenge!" },
+];

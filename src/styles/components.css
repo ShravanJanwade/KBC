@@ -477,3 +477,21 @@
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--cat) 35%, transparent) inset;
   flex: none;
 }
+
+.select {
+  max-width: min(320px, 60vw);
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border-strong);
+  background: rgba(5, 4, 30, 0.75);
+  color: var(--text);
+  font-size: 0.84rem;
+  outline: none;
+}
+.select:focus {
+  border-color: var(--gold-2);
+}
+.select option {
+  background: #0d0942;
+}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Play, SlidersHorizontal, History as HistoryIcon, UserRound, Settings as SettingsIcon, CircleHelp, Volume2, VolumeX, Trophy, Brain, Gamepad2, Library } from "lucide-react";
 import Logo from "../components/Logo";
@@ -12,15 +12,38 @@ import { QUESTIONS } from "../data/questions";
 import { shortINR } from "../lib/format";
 import { audio } from "../audio/engine";
 import { sfx } from "../audio/synth";
+import { useHost } from "../hooks/useHost";
+import { host } from "../data/host";
+import HostBanner from "./hotseat/HostBanner";
+import "../styles/hotseat.css";
+
+// The host greets the player once per visit, not every time they return to the menu.
+let greeted = false;
 import "../styles/screens.css";
 
 export default function MainMenu({ go, onPlay }) {
   useStageMood("menu");
   const { profile, history, seen, settings, updateSettings } = useApp();
 
+  const voice = useHost();
+  const [greeting, setGreeting] = useState(null);
+
   useEffect(() => {
     audio.unlock();
     audio.music("theme");
+    if (greeted || !profile) return;
+    greeted = true;
+    const line = host.menuGreeting(profile.name, new Date().getHours(), history[0]?.prize ?? 0);
+    const t1 = setTimeout(() => {
+      setGreeting({ ...line, key: 1 });
+      voice.say(line);
+    }, 900);
+    const t2 = setTimeout(() => setGreeting(null), 7500);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const iq = iqOf(profile?.rating.theta ?? 0);
@@ -103,6 +126,10 @@ export default function MainMenu({ go, onPlay }) {
             </motion.div>
           ))}
         </nav>
+      </div>
+
+      <div className="menu__host">
+        <HostBanner line={greeting} language={settings.language} />
       </div>
 
       <motion.footer className="menu__stats" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>

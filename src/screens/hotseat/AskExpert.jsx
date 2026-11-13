@@ -6,7 +6,7 @@ import { Modal, Button } from "../../components/ui";
 import { EXPERT } from "../../data/people";
 import { expertAnswer } from "../../engine/lifelines";
 import { useSequencer } from "../../hooks/useSequencer";
-import { say, cancelSpeech } from "../../audio/speech";
+import { speakEnglish, cancelSpeech } from "../../audio/speech";
 import { audio } from "../../audio/engine";
 import { sfx } from "../../audio/synth";
 import { LETTERS } from "../../lib/format";
@@ -52,7 +52,8 @@ export default function AskExpert({ q, removed, voice, onClose }) {
           }
         }, 28);
       });
-      await Promise.all([typing, voice ? say(speech, EXPERT.voice) : Promise.resolve()]);
+      // Sentence breaks become short natural pauses in the spoken version.
+      await Promise.all([typing, voice ? speakEnglish(speech.replace(/([.!?])\s+/g, "$1| "), EXPERT.voice) : Promise.resolve()]);
       await wait(300);
       setStage("done");
       sfx.ding();

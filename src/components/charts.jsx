@@ -42,7 +42,7 @@ export function Donut({ items, size = 220, thickness = 26, children }) {
 export function Radar({ axes, size = 300 }) {
   const cx = size / 2;
   const cy = size / 2;
-  const R = size / 2 - 46;
+  const R = size / 2 - 58;
   const n = axes.length;
   const point = (i, v) => {
     const a = (i / n) * Math.PI * 2 - Math.PI / 2;
@@ -50,7 +50,7 @@ export function Radar({ axes, size = 300 }) {
   };
   const poly = axes.map((ax, i) => point(i, Math.max(0.04, ax.value)).join(",")).join(" ");
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="radar" role="img" aria-label="Topic strengths">
+    <svg viewBox={`0 0 ${size} ${size}`} className="radar" role="img" aria-label="Topic strengths" style={{ overflow: "visible" }}>
       {[0.25, 0.5, 0.75, 1].map((lv) => (
         <polygon key={lv} points={axes.map((_, i) => point(i, lv).join(",")).join(" ")} fill="none" stroke="rgba(255,255,255,.1)" />
       ))}

@@ -15,6 +15,9 @@ import { RIVALS } from "../data/people";
 import { prepareFFF, topicWeight } from "../engine/selector";
 import { simulateFFF } from "../engine/lifelines";
 import { audio } from "../audio/engine";
+import { cancelSpeech } from "../audio/speech";
+import { useHost } from "../hooks/useHost";
+import { host } from "../data/host";
 import { sfx } from "../audio/synth";
 import { LETTERS } from "../lib/format";
 import { weightedIndex } from "../lib/random";
@@ -28,6 +31,7 @@ export default function FastestFinger({ onWin, onExit }) {
   const { flash, setMood } = useStage();
   const { profile, seen, markSeen } = useApp();
   const { run } = useSequencer();
+  const voice = useHost();
 
   const [round, setRound] = useState(1);
   const [phase, setPhase] = useState("intro"); // intro | countdown | question | answer | locked | reveal | results
@@ -48,7 +52,12 @@ export default function FastestFinger({ onWin, onExit }) {
   useEffect(() => {
     audio.unlock();
     audio.music("theme", { fade: 0.5 });
-  }, []);
+    const t = setTimeout(() => voice.say(host.fff.intro()), 600);
+    return () => {
+      clearTimeout(t);
+      cancelSpeech();
+    };
+  }, [voice]);
 
   const pickItem = () => {
     const pool = FFF_QUESTIONS.filter((x) => !used.current.has(x.id));
@@ -62,7 +71,8 @@ export default function FastestFinger({ onWin, onExit }) {
     used.current.add(raw.id);
     markSeen([raw.id]);
     setRound(r);
-    setItem(prepareFFF(raw));
+    const prepared = prepareFFF(raw);
+    setItem(prepared);
     setOrder([]);
     setShown(0);
     setRevealed(0);
@@ -72,7 +82,8 @@ export default function FastestFinger({ onWin, onExit }) {
     setPhase("countdown");
     setMood("fff");
     audio.stopMusic(0.6);
-    run(async (wait) => {
+    cancelSpeech();
+    run(async (wait, alive) => {
       for (let c = 3; c >= 1; c--) {
         setCount(c);
         sfx.warnBeep();
@@ -80,15 +91,31 @@ export default function FastestFinger({ onWin, onExit }) {
       }
       sfx.boom();
       flash("white");
-      audio.music("bedHard", { fade: 0.4, volume: 0.6 });
+      audio.music("bedHard", { fade: 0.4, volume: 0.5 });
       setPhase("question");
       sfx.reveal();
-      await wait(950);
-      for (let i = 1; i <= 4; i++) {
-        setShown(i);
-        sfx.optionIn();
-        await wait(240);
+      // The host reads the question and the four items, then starts the clock.
+      if (voice.on()) {
+        await wait(350);
+        await voice.read(prepared.q, "calm");
+        for (let i = 1; i <= 4; i++) {
+          if (!alive()) return;
+          setShown(i);
+          sfx.optionIn();
+          await voice.read(`${LETTERS[i - 1]}| ${prepared.options[i - 1]}`);
+          await wait(60);
+        }
+        if (!alive()) return;
+        await voice.say(host.fff.go());
+      } else {
+        await wait(950);
+        for (let i = 1; i <= 4; i++) {
+          setShown(i);
+          sfx.optionIn();
+          await wait(240);
+        }
       }
+      if (!alive()) return;
       startAt.current = performance.now();
       setPhase("answer");
     });
@@ -142,34 +169,42 @@ export default function FastestFinger({ onWin, onExit }) {
       { id: "you", isPlayer: true, name: profile.name, city: profile.city, avatar: profile.avatar, correct, timeMs: Math.round(t) },
       ...sim.map((s) => ({ ...RIVALS.find((r) => r.id === s.id), ...s })),
     ];
-    run(async (wait) => {
+    run(async (wait, alive) => {
       for (const s of [...sim].sort((a, b) => a.timeMs - b.timeMs)) {
         setLockedIn((prev) => new Set(prev).add(s.id));
         sfx.keypad();
         await wait(110);
       }
-      await wait(600);
+      const lockedLine = voice.say(host.fff.locked());
+      await Promise.all([lockedLine, wait(600)]);
+      if (!alive()) return;
       audio.stopMusic(0.6);
       setPhase("reveal");
+      await voice.say(host.fff.order(), "dramatic");
       for (let k = 1; k <= 4; k++) {
+        if (!alive()) return;
         setRevealed(k);
         sfx.tick();
-        await wait(700);
+        await Promise.all([voice.read(LETTERS[it.solution[k - 1]]), wait(650)]);
       }
       sfx.ding();
-      await wait(700);
+      await wait(600);
       const ranked = [...all].sort((a, b) => (a.correct === b.correct ? a.timeMs - b.timeMs : a.correct ? -1 : 1));
       setResults(ranked);
       setPhase("results");
-      if (ranked[0]?.isPlayer && ranked[0].correct) {
+      const top = ranked[0];
+      if (top?.isPlayer && top.correct) {
         flash("gold");
         setMood("celebrate");
         sfx.fanfare();
         sfx.applause(4.5, 0.85);
         audio.play("winner");
+        voice.say(host.fff.winner(profile.name, (top.timeMs / 1000).toFixed(2)), "excited");
       } else {
         sfx.error();
         setMood("calm");
+        const verdict = top?.correct ? host.fff.lost(top.name, top.city) : host.fff.nobody();
+        voice.say(verdict).then(() => alive() && voice.say(round < MAX_ROUNDS ? host.fff.nextRound() : host.fff.wildcard()));
       }
     });
   };

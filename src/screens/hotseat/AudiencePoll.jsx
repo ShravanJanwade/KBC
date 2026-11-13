@@ -6,16 +6,19 @@ import { audiencePoll } from "../../engine/lifelines";
 import { audio } from "../../audio/engine";
 import { sfx } from "../../audio/synth";
 import { LETTERS } from "../../lib/format";
+import { host, lineText } from "../../data/host";
+import { speakLine, hostWho } from "../../audio/speech";
 
 const VOTE_MS = 7500;
 const SEATS = 84;
 
-export default function AudiencePoll({ q, removed, onClose }) {
+export default function AudiencePoll({ q, removed, settings, onClose }) {
   const result = useMemo(() => audiencePoll({ answer: q.answer, d: q.d, removed }), [q, removed]);
   const [done, setDone] = useState(false);
   const [bars, setBars] = useState([0, 0, 0, 0]);
   const [left, setLeft] = useState(Math.ceil(VOTE_MS / 1000));
   const [lit, setLit] = useState(() => new Set());
+  const [comment, setComment] = useState(null);
   const finished = useRef(false);
 
   const finish = () => {
@@ -27,6 +30,9 @@ export default function AudiencePoll({ q, removed, onClose }) {
     audio.stopMusic(0.8);
     sfx.ding();
     sfx.applause(2, 0.45);
+    const line = host.lifeline.pollResult(Math.max(...result));
+    setComment(line);
+    if (settings?.hostVoice) setTimeout(() => speakLine(line, hostWho(), { language: settings.language }), 700);
   };
 
   useEffect(() => {
@@ -96,7 +102,7 @@ export default function AudiencePoll({ q, removed, onClose }) {
         </div>
 
         <footer className="ll-foot">
-          <p className="ll-foot__note">{done ? "The audience has spoken — but the final decision is yours." : "Studio audience members are voting on their keypads…"}</p>
+          <p className="ll-foot__note">{done && comment ? <><b className="t-gold">Host:</b> {lineText(comment, settings?.language)}</> : done ? "The audience has spoken — but the final decision is yours." : "Studio audience members are voting on their keypads…"}</p>
           {done ? (
             <Button variant="gold" iconRight={ArrowRight} onClick={() => onClose({ shares: result })}>
               Back to the game

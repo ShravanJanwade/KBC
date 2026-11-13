@@ -2,6 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { load, save, remove } from "../lib/storage";
 import { uid } from "../lib/random";
 import { audio } from "../audio/engine";
+import { configureSpeech, setClip } from "../audio/speech";
+import { loadClips } from "../lib/clipStore";
 import { newRating } from "../engine/rating";
 
 const DEFAULT_SETTINGS = {
@@ -9,8 +11,12 @@ const DEFAULT_SETTINGS = {
   music: 0.6,
   sfx: 0.9,
   muted: false,
-  hostVoice: false,
+  hostVoice: true, // the host narrates every question, option and line
   lifelineVoice: true,
+  speechRate: 1,
+  hostVoiceHi: "", // "" = pick the best installed voice automatically
+  hostVoiceEn: "",
+  hostOneVoice: true, // a natural Hindi voice also reads the English questions
   timerMode: "classic", // classic | relaxed | off
   confirmLock: true,
   fff: true,
@@ -22,7 +28,12 @@ const DEFAULT_SETTINGS = {
 const AppCtx = createContext(null);
 
 export function AppProvider({ children }) {
-  const [settings, setSettings] = useState(() => ({ ...DEFAULT_SETTINGS, ...load("settings", {}) }));
+  const [settings, setSettings] = useState(() => {
+    const stored = load("settings", {});
+    // v2 turned full narration on; older saves had the host silent by default.
+    const migrated = stored.v === 2 ? stored : { ...stored, hostVoice: true, lifelineVoice: true };
+    return { ...DEFAULT_SETTINGS, ...migrated, v: 2 };
+  });
   const [profiles, setProfiles] = useState(() => load("profiles", []));
   const [activeId, setActiveId] = useState(() => {
     const id = load("active", null);
@@ -45,6 +56,12 @@ export function AppProvider({ children }) {
   useEffect(() => {
     audio.setVolumes({ master: settings.muted ? 0 : settings.master, music: settings.music, sfx: settings.sfx });
   }, [settings.master, settings.music, settings.sfx, settings.muted]);
+  useEffect(() => {
+    configureSpeech({ rate: settings.speechRate, hostHi: settings.hostVoiceHi, hostEn: settings.hostVoiceEn, oneVoice: settings.hostOneVoice });
+  }, [settings.speechRate, settings.hostVoiceHi, settings.hostVoiceEn, settings.hostOneVoice]);
+  useEffect(() => {
+    loadClips().then((clips) => clips.forEach((blob, id) => setClip(id, blob)));
+  }, []);
 
   const switchProfile = useCallback((id) => {
     setActiveId(id);
@@ -114,7 +131,7 @@ export function AppProvider({ children }) {
     });
     setProfiles([]);
     switchProfile(null);
-    setSettings(DEFAULT_SETTINGS);
+    setSettings({ ...DEFAULT_SETTINGS, v: 2 });
   }, [profiles, switchProfile]);
 
   const value = useMemo(

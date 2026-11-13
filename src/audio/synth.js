@@ -262,6 +262,48 @@ export const sfx = {
       lfo.stop(n + 0.08);
     };
   },
+  // Faint telephone-line hiss with the odd crackle while a call is connected. Returns a stop function.
+  phoneLine() {
+    const c = ctx();
+    if (!c) return () => {};
+    const t0 = c.currentTime;
+    const src = c.createBufferSource();
+    src.buffer = getNoise(c);
+    src.loop = true;
+    const band = c.createBiquadFilter();
+    band.type = "bandpass";
+    band.frequency.value = 1700;
+    band.Q.value = 0.7;
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.011, t0 + 0.5);
+    src.connect(band).connect(g).connect(audio.sfxBus);
+    src.start(t0);
+    const crackle = setInterval(() => {
+      if (Math.random() < 0.35) noise({ dur: 0.03 + Math.random() * 0.05, gain: 0.015 + Math.random() * 0.03, attack: 0.002, filter: "bandpass", freq: 1200 + Math.random() * 2500, q: 3 });
+    }, 650);
+    return () => {
+      clearInterval(crackle);
+      const n = c.currentTime;
+      g.gain.cancelScheduledValues(n);
+      g.gain.setTargetAtTime(0.0001, n, 0.05);
+      src.stop(n + 0.4);
+    };
+  },
+  // The bright two-note "payment received" chime of a UPI app.
+  upiSuccess() {
+    const t = now();
+    [[1318.5, 0], [1975.5, 0.13]].forEach(([f, dt]) => {
+      tone({ freq: f, dur: 1.1, gain: 0.11, t: t + dt, attack: 0.004 });
+      tone({ freq: f * 2, dur: 0.5, gain: 0.025, t: t + dt, attack: 0.004 });
+    });
+    this.sparkle(8, 0.6);
+  },
+  notify() {
+    const t = now();
+    tone({ freq: 880, dur: 0.18, gain: 0.07, t });
+    tone({ freq: 1174.7, dur: 0.3, gain: 0.07, t: t + 0.09 });
+  },
   applause(dur = 3.5, level = 1) {
     const c = ctx();
     if (!c) return;

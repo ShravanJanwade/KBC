@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { RotateCcw, Home, History as HistoryIcon, Brain, Trophy, Timer, Target, Sparkles, TrendingUp, TrendingDown, Lightbulb } from "lucide-react";
-import Cheque from "../components/Cheque";
+import UpiTransfer from "../components/UpiTransfer";
 import Celebration from "../components/Celebration";
 import QuestionRecap from "../components/QuestionRecap";
 import { Button, AnimatedMoney, ProgressBar } from "../components/ui";
@@ -13,6 +13,9 @@ import { ACHIEVEMENTS } from "../data/achievements";
 import { CATEGORY_BY_ID } from "../data/categories";
 import { tierOf } from "../engine/rating";
 import { audio } from "../audio/engine";
+import { useHost } from "../hooks/useHost";
+import { host } from "../data/host";
+import { cancelSpeech } from "../audio/speech";
 import { sfx } from "../audio/synth";
 import { formatDuration } from "../lib/format";
 import "../styles/pages.css";
@@ -30,6 +33,7 @@ function headline(game) {
 export default function Result({ game, unlocked = [], onPlayAgain, onMenu, onHistory }) {
   const { profile } = useApp();
   const { push } = useToasts();
+  const voice = useHost();
   const big = game.prize >= 1e7;
   useStageMood(big ? "celebrate" : game.prize >= 320000 ? "menu" : "calm");
 
@@ -43,13 +47,19 @@ export default function Result({ game, unlocked = [], onPlayAgain, onMenu, onHis
       audio.music("outro", { fade: 0.6 });
       if (game.prize > 0) sfx.applause(2.6, 0.55);
     }
+    // With no prize there's no transfer, so the host signs off straight away.
+    const bye = game.prize > 0 ? null : setTimeout(() => voice.say(host.goodbye(0)), 1400);
     const timers = unlocked.map((id, i) =>
       setTimeout(() => {
         const a = ACH[id];
         if (a) push({ title: a.name, desc: a.desc, icon: a.icon });
       }, 1800 + i * 1100)
     );
-    return () => timers.forEach(clearTimeout);
+    return () => {
+      timers.forEach(clearTimeout);
+      clearTimeout(bye);
+      cancelSpeech();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -84,11 +94,17 @@ export default function Result({ game, unlocked = [], onPlayAgain, onMenu, onHis
         <div className="result__grid">
           <div className="result__prize">
             {game.prize > 0 ? (
-              <Cheque name={profile?.name ?? "Player"} amount={game.prize} date={game.endedAt} />
+              <UpiTransfer
+                name={profile?.name ?? "Player"}
+                avatar={profile?.avatar}
+                amount={game.prize}
+                date={game.endedAt}
+                onSuccess={() => voice.say(host.transfer(), "excited").then(() => voice.say(host.goodbye(game.prize)))}
+              />
             ) : (
               <motion.div className="result__zero glass" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 }}>
                 <div className="result__zero-amt t-display">₹0</div>
-                <p>No cheque this time — the first padaav is at ₹10,000.</p>
+                <p>No transfer this time — the first padaav is at ₹10,000.</p>
               </motion.div>
             )}
             <div className="result__tip card">

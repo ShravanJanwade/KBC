@@ -5,6 +5,9 @@ import Logo from "../components/Logo";
 import { useStage, useStageMood } from "../components/Stage";
 import { audio } from "../audio/engine";
 import { sfx } from "../audio/synth";
+import { useHost } from "../hooks/useHost";
+import { host } from "../data/host";
+import { sleep } from "../lib/random";
 import "../styles/screens.css";
 
 const TITLE = ["कौन", "बनेगा", "करोड़पति"];
@@ -12,6 +15,7 @@ const TITLE = ["कौन", "बनेगा", "करोड़पति"];
 export default function Splash({ onDone }) {
   const [phase, setPhase] = useState("gate");
   const { flash } = useStage();
+  const voice = useHost();
   const done = useRef(false);
   useStageMood(phase === "gate" ? "dark" : "celebrate");
 
@@ -40,11 +44,18 @@ export default function Splash({ onDone }) {
 
   useEffect(() => {
     if (phase !== "intro") return;
+    let gone = false;
     const t1 = setTimeout(() => sfx.sparkle(16, 1.2), 1500);
-    const t2 = setTimeout(finish, 5600);
+    // "Deviyon aur Sajjanon..." lands as the title settles; move on once the host has finished.
+    const t2 = setTimeout(() => {
+      Promise.all([voice.say(host.splash(), "dramatic"), sleep(3600)]).then(() => !gone && setTimeout(finish, 450));
+    }, 1600);
+    const t3 = setTimeout(finish, voice.on() ? 11000 : 5600);
     return () => {
+      gone = true;
       clearTimeout(t1);
       clearTimeout(t2);
+      clearTimeout(t3);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);

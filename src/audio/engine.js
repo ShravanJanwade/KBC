@@ -170,6 +170,37 @@ class AudioEngine {
     this.duckGain.gain.setTargetAtTime(1, this.ctx.currentTime, time / 3);
   }
 
+  // Play an arbitrary audio URL (e.g. a recorded host clip) through the effects bus.
+  playUrl(url, volume = 1) {
+    if (!this.ensure()) return { done: Promise.resolve(), stop() {} };
+    const el = new Audio(url);
+    const gain = this.ctx.createGain();
+    gain.gain.value = volume;
+    const src = this.ctx.createMediaElementSource(el);
+    src.connect(gain).connect(this.sfxBus);
+    let resolve;
+    const done = new Promise((r) => (resolve = r));
+    const finish = () => {
+      el.onended = el.onerror = null;
+      try {
+        src.disconnect();
+      } catch {
+        /* already disconnected */
+      }
+      resolve();
+    };
+    el.onended = finish;
+    el.onerror = finish;
+    el.play()?.catch(finish);
+    return {
+      done,
+      stop: () => {
+        el.pause();
+        finish();
+      },
+    };
+  }
+
   stopAll(fade = 0.3) {
     for (const name of this.tracks.keys()) this.stop(name, fade);
     this.current = null;
